@@ -1,7 +1,3 @@
 spring:
   application:
     name: user-service
-eureka:
-  client:
-    enabled: false
-
