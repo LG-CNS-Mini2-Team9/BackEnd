@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: backend-user
+              predicates:
+                - Path=/api/user/**
+              uri: lb://backend-user
+              filters:
+                - AddAuthenticationHeader
+            - id: backend-alim
+              predicates:
+                - Path=/api/alim/**
+              uri: lb://backend-alim
+              filters:
+                - AddAuthenticationHeader
+            - id: backend-post
+              predicates:
+                - Path=/api/post/**
+              uri: lb://backend-post
+              filters:
+                - AddAuthenticationHeader
+
+jwt:
+  expires-in: 86400 # 1day
+  mobile-expires-in: 31536000
+  table-expires-in: 31536000
+  header: Authorization
+  secret-key: AADfaskllew32dsfasdTG764Gds3as54dfa32s1df2a6fwlkj298GsWg86G76745ADdjnfsk
+
