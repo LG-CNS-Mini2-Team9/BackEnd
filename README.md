@@ -1,3 +1,4 @@
+```
 .env.example 파일을 이용하여
 개인별 .env를 생성하여 사용하시면 됩니다!
 
@@ -8,3 +9,4 @@
 ├── 🟡 Answer DB            → localhost:3308
 ├── 🟣 Statistic DB         → localhost:3309
 └── 🟠 AI Feedback DB       → localhost:3310
+```
