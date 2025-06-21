@@ -1,4 +1,7 @@
 spring:
-        application:
-                name: user-service
+  application:
+    name: user-service
+eureka:
+  client:
+    enabled: false
 
