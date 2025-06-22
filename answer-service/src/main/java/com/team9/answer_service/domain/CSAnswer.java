@@ -25,6 +25,9 @@ public class CSAnswer {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private Long score;
+
     @Column(name = "question_id", nullable = false)
     private Long csQuestionId;
 
