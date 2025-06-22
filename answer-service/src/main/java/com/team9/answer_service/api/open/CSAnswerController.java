@@ -43,17 +43,32 @@ public class CSAnswerController {
                 .body(CustomResponse.created(response));
     }
 
-    // 답변 리스트 조회
-    @GetMapping
-    public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readAnswerList(
-        @AuthenticationPrincipal UserDetails userDetails,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(required = false) Long questionId
+    // 내 답변 리스트 조회 (모든/질문별)
+    @GetMapping(value = "/my")
+    public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readMyAnswerList(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) Long questionId
     ) {
         Order order = Order.desc("id");
         Sort sort = Sort.by(order);
-        Pageable pageable = PageRequest.of(page-1, 10, sort);
-        
+        Pageable pageable = PageRequest.of(page - 1, 10, sort);
+
+        Page<CSAnswerResponse.CSAnswerListResponse> responseList = csAnswerService.getMyAnswerList(userDetails, pageable, questionId);
+        return ResponseEntity.ok(CustomResponse.ok(responseList));
+    }
+
+    // 질문별 답변 리스트 조회
+    @GetMapping(value = "/{questionId}")
+    public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readAnswerList(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "1") int page,
+            @PathVariable Long questionId
+    ) {
+        Order order = Order.desc("id");
+        Sort sort = Sort.by(order);
+        Pageable pageable = PageRequest.of(page - 1, 10, sort);
+
         Page<CSAnswerResponse.CSAnswerListResponse> responseList = csAnswerService.getAnswerList(userDetails, pageable, questionId);
         return ResponseEntity.ok(CustomResponse.ok(responseList));
     }
@@ -85,6 +100,7 @@ public class CSAnswerController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CustomResponse.success(GeneralSuccessCode._DELETED, null));
     }
+
 }
 
 
