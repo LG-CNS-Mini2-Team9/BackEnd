@@ -3,9 +3,12 @@ package com.team9.answer_service.service;
 import java.time.LocalDateTime;
 
 import com.team9.answer_service.remote.csquestion.dto.CSQuestionDto;
+import com.team9.answer_service.remote.csquestion.dto.RemoteCSQuestionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -13,39 +16,31 @@ import com.team9.answer_service.domain.CSAnswer;
 import com.team9.answer_service.domain.dto.CSAnswerRequest;
 import com.team9.answer_service.domain.dto.CSAnswerResponse;
 import com.team9.answer_service.domain.repository.CSAnswerRepository;
-import com.lgcns.backend.csquestion.domain.CSQuestion;
-import com.lgcns.backend.csquestion.repository.CSQuestionRepository;
-import com.lgcns.backend.user.domain.User;
-import com.lgcns.backend.user.repository.UserRepository;
 
 @Service
+@RequiredArgsConstructor
 public class CSAnswerService {
 
-    @Autowired
-    private CSAnswerRepository csAnswerRepository;
+    private final CSAnswerRepository csAnswerRepository;
+    private final RemoteCSQuestionService remoteCSQuestionService;
 
-//    @Autowired
-//    private CSQuestionRepository csQuestionRepository;
-
-//    @Autowired
-//    private UserRepository userRepository;
 
     // 답변 작성
     public CSAnswerResponse.CSAnswerDetailResponse createAnswer(CSAnswerRequest.CSAnswerCreateRequest request,
                                                                 UserDetails userDetails) {
         Long userId = getUserIdFromDetails(userDetails);
-        // TODO: remoteCSQuestionService에서 questionId로 question 정보 받아오기
-        CSQuestionDto.Response question = remoteCSQuestionService.findById(request.getCsquestion_id())
-                .orElseThrow(() -> new IllegalArgumentException("질문이 존재하지 않습니다."));
-//        CSQuestion question = csQuestionRepository.findById(request.getCsquestion_id()) // 400
-//                .orElseThrow(() -> new IllegalArgumentException("질문이 존재하지 않습니다."));
+
+        CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(request.getCsquestion_id());
+        if (question == null) {
+            throw new IllegalArgumentException("질문이 존재하지 않습니다.");
+        }
 
         CSAnswer answer = new CSAnswer();
         answer.setContent(request.getCsanswer_content());
         answer.setCreatedAt(LocalDateTime.now());
         answer.setFeedback("아직 피드백 없음");
-        answer.setCsQuestion(question);
-        answer.setUser(user);
+        answer.setCsQuestionId(request.getCsquestion_id());
+        answer.setUserId(userId);
 
         csAnswerRepository.save(answer);
 
