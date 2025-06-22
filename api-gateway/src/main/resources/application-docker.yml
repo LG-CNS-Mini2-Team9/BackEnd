@@ -1,0 +1,46 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+        - id: question-service
+          uri: lb://QUESTION-SERVICE
+          predicates:
+            - Path=/api/questions/**
+          filters:
+            - StripPrefix=1
+        - id: answer-service
+          uri: lb://ANSWER-SERVICE
+          predicates:
+            - Path=/api/answers/**
+          filters:
+            - StripPrefix=1
+        - id: ai-feedback-service
+          uri: lb://AI-FEEDBACK-SERVICE
+          predicates:
+            - Path=/api/ai-feedback/**
+          filters:
+            - StripPrefix=1
+        - id: statistic-service
+          uri: lb://STATISTIC-SERVICE
+          predicates:
+            - Path=/api/statistics/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://eureka-server:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+    ip-address: ${EUREKA_INSTANCE_IP_ADDRESS:api-gateway}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:3600000}
