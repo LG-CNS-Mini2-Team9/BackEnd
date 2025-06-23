@@ -7,31 +7,31 @@ spring:
           predicates:
             - Path=/api/users/**
           filters:
-            - StripPrefix=1
+            - AddAuthenticationHeader
         - id: question-service
           uri: lb://QUESTION-SERVICE
           predicates:
             - Path=/api/questions/**
           filters:
-            - StripPrefix=1
+            - AddAuthenticationHeader
         - id: answer-service
           uri: lb://ANSWER-SERVICE
           predicates:
             - Path=/api/answers/**
           filters:
-            - StripPrefix=1
+            - AddAuthenticationHeader
         - id: ai-feedback-service
           uri: lb://AI-FEEDBACK-SERVICE
           predicates:
             - Path=/api/ai-feedback/**
           filters:
-            - StripPrefix=1
+            - AddAuthenticationHeader
         - id: statistic-service
           uri: lb://STATISTIC-SERVICE
           predicates:
             - Path=/api/statistics/**
           filters:
-            - StripPrefix=1
+            - AddAuthenticationHeader
 
 eureka:
   client:

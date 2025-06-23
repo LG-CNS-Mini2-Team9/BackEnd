@@ -1,5 +1,7 @@
 package com.team9.api_gateway.config;
 
+import com.team9.api_gateway.security.exception.RestAccessDeniedHandler;
+import com.team9.api_gateway.security.exception.RestAuthenticationEntryPoint;
 import com.team9.api_gateway.security.filter.JwtAuthenticationFilter;
 import com.team9.api_gateway.security.jwt.JwtTokenValidator;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
     private final JwtTokenValidator jwtTokenValidator;
 
     @Bean
@@ -38,6 +42,10 @@ public class WebSecurityConfig {
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtTokenValidator),
                         UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling((exceptionConfig) ->
+                        exceptionConfig
+                                .authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(registry -> registry
                         //.requestMatchers("/api/user/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
