@@ -5,9 +5,10 @@ import com.team9.common.domain.Category;
 import com.team9.common.exception.CustomException;
 import com.team9.question_service.domain.Question;
 import com.team9.question_service.dto.QuestionResponse;
+import com.team9.question_service.feign.AnswerServiceClient;
 import com.team9.question_service.repository.QuestionRepository;
-// TODO: Feign Client import 추가
-// import com.team9.question_service.feign.AnswerServiceClient;
+import com.team9.common.response.CustomResponse;
+import com.team9.question_service.feign.AnswerServiceClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,22 +29,26 @@ import java.util.Set;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
+    private final AnswerServiceClient answerServiceClient; // <<-- 이 줄을 추가하세요!
     // TODO: Answer 서비스와 통신하기 위한 Feign Client 주입
     // private final AnswerServiceClient answerServiceClient;
 
     public Page<QuestionResponse> getQuestionList(String categoryName, Pageable pageable, Long userId) {
         Page<Question> questions;
 
-        // 원본의 CSAnswerRepository 직접 접근 로직을 Feign Client 호출로 대체해야 함
         // TODO: answer-service에 API를 요청하여 현재 사용자가 답변한 질문 ID 목록을 가져옵니다.
-        // final Set<Long> submittedQuestionsIds;
-        // if (userId != null) {
-        //     // 예시: CustomResponse<List<Long>> response = answerServiceClient.getSubmittedQuestionIds(userId);
-        //     // submittedQuestionsIds = new HashSet<>(response.getResult());
-        // } else {
-        //     submittedQuestionsIds = Collections.emptySet();
-        // }
-        final Set<Long> submittedQuestionsIds = new HashSet<>(); // 임시 코드
+        final Set<Long> submittedQuestionsIds;
+        if (userId != null) {
+            // Feign Client를 호출하여 answer-service로부터 데이터를 가져옵니다.
+            CustomResponse<List<Long>> response = answerServiceClient.getSubmittedQuestionIdsByUserId(userId);
+
+            // CustomResponse에서 실제 결과(List<Long>)를 추출하여 Set으로 변환합니다.
+            submittedQuestionsIds = new HashSet<>(response.getResult());
+        } else {
+            // userId가 없으면 (비로그인 사용자) 빈 Set을 사용합니다.
+            submittedQuestionsIds = Collections.emptySet();
+        }
+        // final Set<Long> submittedQuestionsIds = new HashSet<>(); // 임시 코드
 
         if (categoryName == null) {
             questions = questionRepository.findAll(pageable);
@@ -96,11 +101,15 @@ public class QuestionService {
         }
 
         // TODO: answer-service에 API를 요청하여 이 질문에 대한 사용자의 답변 여부를 확인해야 함
-        // boolean isSubmitted = false;
-        // if (userId != null) {
-        //     // 예시: isSubmitted = answerServiceClient.isQuestionSubmitted(userId, question.getId()).getResult();
-        // }
-        boolean isSubmitted = false; // 임시 코드
+        boolean isSubmitted = false;
+        if (userId != null) {
+            // Feign Client를 호출하여 이 사용자가 답변한 모든 질문 ID를 가져옵니다.
+            CustomResponse<List<Long>> response = answerServiceClient.getSubmittedQuestionIdsByUserId(userId);
+            Set<Long> submittedIds = new HashSet<>(response.getResult());
+            // 오늘의 질문 ID가 답변 목록에 포함되어 있는지 확인합니다.
+            isSubmitted = submittedIds.contains(question.getId());
+        }
+        // boolean isSubmitted = false; // 임시 코드
 
         return QuestionResponse.builder()
                 .id(question.getId())
