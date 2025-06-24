@@ -1,4 +1,4 @@
-package com.lgcns.backend.global.code;
+package com.team9.user_service.global.code;
 
 import org.springframework.http.HttpStatus;
 

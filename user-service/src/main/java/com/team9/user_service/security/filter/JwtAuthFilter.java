@@ -1,9 +1,10 @@
-package com.lgcns.backend.security.filter;
+package com.team9.user_service.security.filter;
 
 import java.io.IOException;
 import java.util.List;
 
-import com.lgcns.backend.global.code.GeneralErrorCode;
+import com.team9.user_service.global.code.GeneralErrorCode;
+import com.team9.user_service.security.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.lgcns.backend.security.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

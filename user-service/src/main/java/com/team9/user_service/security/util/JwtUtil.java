@@ -1,4 +1,4 @@
-package com.lgcns.backend.security.util;
+package com.team9.user_service.security.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

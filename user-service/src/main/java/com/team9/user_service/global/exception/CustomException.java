@@ -1,6 +1,6 @@
-package com.lgcns.backend.global.exception;
+package com.team9.user_service.global.exception;
 
-import com.lgcns.backend.global.code.BaseErrorCode;
+import com.team9.user_service.global.code.BaseErrorCode;
 import org.springframework.http.HttpStatus;
 
 public class CustomException extends RuntimeException {

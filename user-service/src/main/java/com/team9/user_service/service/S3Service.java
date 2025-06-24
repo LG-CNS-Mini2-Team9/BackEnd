@@ -1,4 +1,4 @@
-package com.lgcns.backend.user.service;
+package com.team9.user_service.service;
 
 
 import com.amazonaws.services.s3.AmazonS3Client;

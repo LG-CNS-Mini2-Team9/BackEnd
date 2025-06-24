@@ -1,23 +1,20 @@
-package com.lgcns.backend.user.service;
+package com.team9.user_service.service;
+
+//import com.lgcns.backend.csanswer.repository.CSAnswerRepository;
 
 
-import com.lgcns.backend.Like.repository.LikeRepository;
-import com.lgcns.backend.comment.respository.CommentRepository;
-import com.lgcns.backend.global.code.GeneralErrorCode;
-import com.lgcns.backend.global.code.GeneralSuccessCode;
-import com.lgcns.backend.global.response.CustomResponse;
-import com.lgcns.backend.post.respository.PostRepository;
-import com.lgcns.backend.security.util.JwtUtil;
-import com.lgcns.backend.user.domain.User;
-import com.lgcns.backend.user.dto.request.LoginRequestDto;
-import com.lgcns.backend.user.dto.request.SignUpRequestDto;
-import com.lgcns.backend.user.dto.request.UpdateUserRequestDto;
-import com.lgcns.backend.user.repository.UserRepository;
-import com.lgcns.backend.user.config.RedisConfig;
+import com.team9.user_service.domain.User;
+import com.team9.user_service.dto.request.LoginRequestDto;
+import com.team9.user_service.dto.request.SignUpRequestDto;
+import com.team9.user_service.dto.request.UpdateUserRequestDto;
+import com.team9.user_service.global.code.GeneralErrorCode;
+import com.team9.user_service.global.code.GeneralSuccessCode;
+import com.team9.user_service.global.response.CustomResponse;
+import com.team9.user_service.repository.UserRepository;
+import com.team9.user_service.security.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,13 +23,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import com.lgcns.backend.csanswer.repository.CSAnswerRepository;
+
 
 
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -51,16 +46,8 @@ public class UserService {
     AuthenticationManager authManager;
     @Autowired
     private S3Service s3Service;
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-    @Autowired
-    private CSAnswerRepository csAnswerRepository;
-    @Autowired
-    private PostRepository postRepository;
-    @Autowired
-    private LikeRepository likeRepository;
-    @Autowired
-    private CommentRepository commentRepository;
+//    @Autowired
+//    private CSAnswerRepository csAnswerRepository;
 
     // 회원가입 기능
     public void signUp(SignUpRequestDto dto, String imageurl) {
@@ -78,9 +65,8 @@ public class UserService {
         newUser.setName(dto.getName());
         newUser.setNickname(dto.getNickname());
         newUser.setProfileImage(imageurl);
-        // userRole을 User로 지정
-        newUser.setRole("ROLE_USER");
-
+        newUser.setRole("ROLE_USER"); // userRole을 User로 지정
+        newUser.setInterests(dto.getInterests());
 
         userRepository.save(newUser);
 
@@ -99,12 +85,6 @@ public class UserService {
             String refreshToken = jwtUtil.createRefreshToken(authentication.getName()); // 리프레시 토큰 발급 추가
             System.out.println("✅ 인증 성공: " + authentication.getName());
 
-            // RefreshToken을 Redis에 저장
-            redisTemplate.opsForValue().set(
-                    "RT:" + authentication.getName(),   // 이메일을 Key로 사용
-                    refreshToken,
-                    Duration.ofDays(7)                  // 7일간 유효
-            );
 
             User user = userRepository.findByEmail(dto.getEmail())
                     .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
@@ -140,18 +120,8 @@ public class UserService {
         try {
             logger.info("사용자 삭제 시작: " + user.getEmail());
 
-            // 연관된 데이터 삭제 (CSAnswer, Post, Like, Comment)
-            csAnswerRepository.deleteByUser(user);
-            logger.info("CSAnswer 삭제 완료: " + user.getEmail());
-
-            postRepository.deleteByUser(user);
-            logger.info("Post 삭제 완료: " + user.getEmail());
-
-            likeRepository.deleteByUser(user);
-            logger.info("Like 삭제 완료: " + user.getEmail());
-
-            commentRepository.deleteByUser(user);
-            logger.info("Comment 삭제 완료: " + user.getEmail());
+//            csAnswerRepository.deleteByUser(user);
+//            logger.info("CSAnswer 삭제 완료: " + user.getEmail());
 
             // 사용자 삭제
             userRepository.delete(user);

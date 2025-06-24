@@ -1,4 +1,4 @@
-package com.lgcns.backend.user.config;
+package com.team9.user_service.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -18,12 +18,10 @@ public class AwsS3Config {
     @Value("${cloud.aws.credentials.secret.key}")
     private String secretKey;
 
-    @Value("ap-northeast-2")
-    private String region;
-
     @Bean
     public AmazonS3Client amazonS3Client() {
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
+        String region = "ap-northeast-2";
         return (AmazonS3Client) AmazonS3ClientBuilder.standard()
                 .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds))

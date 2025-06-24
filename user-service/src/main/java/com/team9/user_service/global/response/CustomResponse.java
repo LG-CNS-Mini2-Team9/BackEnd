@@ -1,11 +1,11 @@
-package com.lgcns.backend.global.response;
+package com.team9.user_service.global.response;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.lgcns.backend.global.code.BaseCode;
-import com.lgcns.backend.global.code.BaseErrorCode;
-import com.lgcns.backend.global.code.GeneralSuccessCode;
+import com.team9.user_service.global.code.BaseCode;
+import com.team9.user_service.global.code.BaseErrorCode;
+import com.team9.user_service.global.code.GeneralSuccessCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

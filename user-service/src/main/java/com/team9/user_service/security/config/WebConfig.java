@@ -1,4 +1,4 @@
-package com.lgcns.backend.security.config;
+package com.team9.user_service.security.config;
 
 
 import org.springframework.context.annotation.Bean;

@@ -1,7 +1,7 @@
-package com.lgcns.backend.user.service;
+package com.team9.user_service.service;
 
-import com.lgcns.backend.user.domain.User;
-import com.lgcns.backend.user.repository.UserRepository;
+import com.team9.user_service.domain.User;
+import com.team9.user_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

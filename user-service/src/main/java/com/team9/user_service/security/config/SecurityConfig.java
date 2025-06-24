@@ -1,7 +1,7 @@
-package com.lgcns.backend.security.config;
+package com.team9.user_service.security.config;
 
-import com.lgcns.backend.security.filter.JwtAuthFilter;
-import com.lgcns.backend.security.util.JwtUtil;
+import com.team9.user_service.security.filter.JwtAuthFilter;
+import com.team9.user_service.security.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

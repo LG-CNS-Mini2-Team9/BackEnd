@@ -1,6 +1,6 @@
-package com.lgcns.backend.user.repository;
+package com.team9.user_service.repository;
 
-import com.lgcns.backend.user.domain.User;
+import com.team9.user_service.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

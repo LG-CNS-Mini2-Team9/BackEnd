@@ -1,7 +1,7 @@
-package com.lgcns.backend.global.exception;
+package com.team9.user_service.global.exception;
 
-import com.lgcns.backend.global.code.GeneralErrorCode;
-import com.lgcns.backend.global.response.CustomResponse;
+import com.team9.user_service.global.code.GeneralErrorCode;
+import com.team9.user_service.global.response.CustomResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

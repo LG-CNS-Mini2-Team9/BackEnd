@@ -1,4 +1,4 @@
-package com.lgcns.backend.user.dto.request;
+package com.team9.user_service.dto.request;
 
 import lombok.Data;
 

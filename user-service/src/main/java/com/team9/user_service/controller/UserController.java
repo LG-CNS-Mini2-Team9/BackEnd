@@ -1,16 +1,15 @@
-package com.lgcns.backend.user.controller;
+package com.team9.user_service.controller;
 
-import com.lgcns.backend.global.code.GeneralErrorCode;
-import com.lgcns.backend.global.code.GeneralSuccessCode;
-import com.lgcns.backend.global.response.CustomResponse;
-import com.lgcns.backend.security.util.JwtUtil;
-import com.lgcns.backend.user.dto.request.LoginRequestDto;
-import com.lgcns.backend.user.dto.request.SignUpRequestDto;
-import com.lgcns.backend.user.dto.request.UpdateUserRequestDto;
-import com.lgcns.backend.user.service.S3Service;
-import com.lgcns.backend.user.service.UserService;
+import com.team9.user_service.dto.request.LoginRequestDto;
+import com.team9.user_service.dto.request.SignUpRequestDto;
+import com.team9.user_service.dto.request.UpdateUserRequestDto;
+import com.team9.user_service.global.code.GeneralErrorCode;
+import com.team9.user_service.global.code.GeneralSuccessCode;
+import com.team9.user_service.global.response.CustomResponse;
+import com.team9.user_service.security.util.JwtUtil;
+import com.team9.user_service.service.S3Service;
+import com.team9.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,8 +38,6 @@ public class UserController {
     AuthenticationManager authManager;
     @Autowired
     S3Service s3Service;
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     // 회원가입
     @PostMapping("/user/signup")
@@ -82,7 +79,6 @@ public class UserController {
     public ResponseEntity<CustomResponse<String>> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
 
         userService.deleteUser(userDetails.getUsername()); // DB의 회원정보 삭제
-        redisTemplate.delete(userDetails.getUsername()); // redis의 refreshToken 삭제
 
         return ResponseEntity
                 .status(GeneralSuccessCode._OK.getHttpStatus())
@@ -111,7 +107,6 @@ public class UserController {
     @PostMapping("/user/logout")
     public ResponseEntity<CustomResponse<String>> logout(@AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername(); // 사용자 이메일 토큰으로 추출
-        redisTemplate.delete(username);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CustomResponse.ok("로그아웃 완료"));

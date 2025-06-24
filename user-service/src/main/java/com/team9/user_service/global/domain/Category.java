@@ -1,4 +1,4 @@
-package com.lgcns.backend.global.domain;
+package com.team9.user_service.global.domain;
 
 public enum Category {
     자료구조,

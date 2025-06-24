@@ -1,11 +1,10 @@
-package com.lgcns.backend.user.domain;
+package com.team9.user_service.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.team9.user_service.global.domain.Category;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Set;
 
 @Entity
 @Data
@@ -35,4 +34,13 @@ public class User {
     private String provider;
 
     private String role;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_category",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private Set<Category> interests;
 }
