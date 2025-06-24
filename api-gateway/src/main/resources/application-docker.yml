@@ -1,4 +1,8 @@
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
   cloud:
     gateway:
       server:
@@ -44,5 +48,8 @@ eureka:
     ip-address: ${EUREKA_INSTANCE_IP_ADDRESS:api-gateway}
 
 jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION:3600000}
+  expires-in: ${JWT_EXPIRATION:86400}
+  mobile-expires-in: ${JWT_EXPIRATION:86400}
+  table-expires-in: ${JWT_EXPIRATION:86400}
+  header: ${JWT_HEADER:Authorization}
+  secret-key: ${JWT_SECRET:AADfaskllew32dsfasdTG764Gds3as54dfa32s1df2a6fwlkj298GsWg86G76745ADdjnfsk}
