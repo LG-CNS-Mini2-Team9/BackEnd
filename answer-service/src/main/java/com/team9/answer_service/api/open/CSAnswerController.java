@@ -29,7 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/answer/v1", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/answers/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class CSAnswerController {
     private final CSAnswerService csAnswerService;
