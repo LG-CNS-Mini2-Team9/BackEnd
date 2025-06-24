@@ -49,8 +49,3 @@ eureka:
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
     prefer-ip-address: true
-
-# OpenAI API 키 (AI 질문 생성 시 필요)
-openai:
-  api:
-    key: ${OPENAI_API_KEY}
