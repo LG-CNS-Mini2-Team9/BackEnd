@@ -17,6 +17,13 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
+    @PostMapping("/test")
+    public ApiResponseDto<String> test() {
+        log.info("hello world");
+        return ApiResponseDto.createOk("hello world");
+    }
+
+
     @PostMapping("/login")
     public ApiResponseDto<TokenDto.AccessRefreshToken> login(@RequestBody @Valid LoginDto loginDto) {
         TokenDto.AccessRefreshToken token = authService.login(loginDto);

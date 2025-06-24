@@ -1,6 +1,6 @@
 package com.team9.api_gateway.filter;
 
-import com.team9.api_gateway.security.jwt.authentication.UserPrinciple;
+import com.team9.api_gateway.security.jwt.authentication.UserPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.function.ServerRequest;
 
@@ -12,7 +12,7 @@ public class AuthenticationHeaderFilterFunction {
             ServerRequest.Builder requestBuilder = ServerRequest.from(request);
 
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof UserPrinciple userPrinciple) {
+            if (principal instanceof UserPrincipal userPrinciple) {
                 requestBuilder.header("X-Auth-UserId", userPrinciple.getUserId());
             }
 
