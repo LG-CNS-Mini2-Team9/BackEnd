@@ -1,3 +1,38 @@
 spring:
   application:
     name: statistic-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3309/statistic_service
+    username: statistic_service
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 1234
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+server:
+  port: 8085
+
+logging:
+  level:
+    com.team9.statistic_service: DEBUG
