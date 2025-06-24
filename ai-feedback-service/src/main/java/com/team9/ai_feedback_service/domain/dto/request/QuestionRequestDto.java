@@ -1,4 +1,4 @@
-package com.team9.ai_feedback_service.remote.dto.request;
+package com.team9.ai_feedback_service.domain.dto.request;
 
 import lombok.Getter;
 

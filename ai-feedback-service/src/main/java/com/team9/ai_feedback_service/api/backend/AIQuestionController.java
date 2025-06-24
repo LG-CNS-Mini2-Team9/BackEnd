@@ -1,7 +1,7 @@
 package com.team9.ai_feedback_service.api.backend;
 
 import com.team9.ai_feedback_service.domain.dto.response.QuestionResponseDto;
-import com.team9.ai_feedback_service.remote.dto.request.QuestionRequestDto;
+import com.team9.ai_feedback_service.domain.dto.request.QuestionRequestDto;
 import com.team9.ai_feedback_service.service.AIQuestionService;
 import com.team9.common.dto.ApiResponseDto;
 import lombok.RequiredArgsConstructor;
