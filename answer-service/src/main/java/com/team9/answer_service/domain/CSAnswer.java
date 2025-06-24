@@ -20,9 +20,6 @@ public class CSAnswer {
     private String content;
 
     @Column(nullable = false)
-    private String feedback;
-
-    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)

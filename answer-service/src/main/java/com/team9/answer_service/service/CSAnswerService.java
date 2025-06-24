@@ -11,7 +11,6 @@ import com.team9.answer_service.remote.csquestion.RemoteCSQuestionService;
 import com.team9.answer_service.remote.user.RemoteUserService;
 import com.team9.answer_service.remote.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
@@ -22,6 +21,7 @@ import com.team9.answer_service.domain.CSAnswer;
 import com.team9.answer_service.domain.dto.CSAnswerRequest;
 import com.team9.answer_service.domain.dto.CSAnswerResponse;
 import com.team9.answer_service.domain.repository.CSAnswerRepository;
+
 
 @Service
 @RequiredArgsConstructor
@@ -46,13 +46,12 @@ public class CSAnswerService {
         CSAnswer answer = new CSAnswer();
         answer.setContent(request.getCsanswer_content());
         answer.setCreatedAt(LocalDateTime.now());
-        answer.setFeedback("아직 피드백 없음");
         answer.setScore(0L);
         answer.setCsQuestionId(request.getCsquestion_id());
         answer.setUserId(userId);
 
         csAnswerRepository.save(answer);
-        return buildAnswerDetailResponse(answer, user.getNickname(), question);
+        return buildAnswerDetailResponse(answer, user, question);
     }
 
     // 내 답변 리스트 조회
@@ -115,7 +114,7 @@ public class CSAnswerService {
         // 답변 작성자 정보 조회
         UserDto.CSAnswerUserDto author = remoteUserService.getUserById(answer.getUserId());
 
-        return buildAnswerDetailResponse(answer, author.getNickname(), question);
+        return buildAnswerDetailResponse(answer, author, question);
     }
 
     // 답변 수정
@@ -136,11 +135,10 @@ public class CSAnswerService {
         }
 
         answer.setContent(request.getCsanswer_content());
-        answer.setFeedback("아직 피드백 없음");
         answer.setScore(0L);
         csAnswerRepository.save(answer);
 
-        return buildAnswerDetailResponse(answer, user.getNickname(), question);
+        return buildAnswerDetailResponse(answer, user, question);
     }
 
     // 답변 삭제
@@ -184,6 +182,28 @@ public class CSAnswerService {
 
     }
 
+    // 통계를 위한 내 답변들 받아오기
+    // 평균점수, 카테고리별 평균점수, 카테고리별 푼 문제 수 통계 서비스에서 구할 수 있게 데이터 전달
+    public List<CSAnswerResponse.CSStatisticResponse> getStatisticAnswers(UserDetails userDetails) {
+        Long userId = getUserIdFromDetails(userDetails);
+        List<CSAnswer> answers = csAnswerRepository.findAllByUserId(userId);
+
+        List<CSAnswerResponse.CSStatisticResponse> statisticAnswers = answers.stream().map((answer) ->
+        {
+            CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(answer.getCsQuestionId());
+
+
+            return CSAnswerResponse.CSStatisticResponse.builder()
+                    .csanswer_id(answer.getId())
+                    .csanswer_score(answer.getScore())
+                    .csquestion_id(answer.getCsQuestionId())
+                    .csquestion_category(question.getCategory())
+                    .build();
+        }).toList();
+
+        return statisticAnswers;
+    }
+
     private Long getUserIdFromDetails(UserDetails userDetails) {
         // TODO: remoteUserService에서 findByEmail
         Long id = remoteUserService.getUserIdByEmail(userDetails.getUsername());
@@ -193,9 +213,10 @@ public class CSAnswerService {
         return id;
     }
 
-    private CSAnswerResponse.CSAnswerDetailResponse buildAnswerDetailResponse(CSAnswer answer, String nickname, CSQuestionDto.Response question) {
+    private CSAnswerResponse.CSAnswerDetailResponse buildAnswerDetailResponse(CSAnswer answer, UserDto.CSAnswerUserDto user, CSQuestionDto.Response question) {
         return CSAnswerResponse.CSAnswerDetailResponse.builder()
-                .user_nickname(nickname)
+                .user_nickname(user.getNickname())
+                .user_id(user.getId())
                 .csquestion_id(question.getId())
                 .csquestion_category(question.getCategory())
                 .csquestion_content(question.getContent())
@@ -203,7 +224,6 @@ public class CSAnswerService {
                 .csanswer_content(answer.getContent())
                 .csanswer_score(answer.getScore())
                 .csanswer_created_at(answer.getCreatedAt())
-                .csanswer_feedback(answer.getFeedback())
                 .build();
     }
 
