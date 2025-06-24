@@ -37,6 +37,16 @@ public class CSAnswerResponse {
         private String csanswer_feedback;
     }
 
+
+    @Data
+    @Builder
+    public static class CSStatisticResponse{
+        private Long csquestion_id;
+        private Category csquestion_category;
+        private Long csanswer_id;
+        private Long csanswer_score;
+    }
+
 //    @Data
 //    @Builder
 //    public static class AIFeedbackResponse {
