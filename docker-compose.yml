@@ -482,8 +482,9 @@ services:
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: true
       EUREKA_INSTANCE_IP_ADDRESS: api-gateway
       # JWT 설정
-      JWT_SECRET: ${JWT_SECRET:-1234567890123456789012345678901234567890123}
-      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      JWT_SECRET: ${JWT_SECRET:-AADfaskllew32dsfasdTG764Gds3as54dfa32s1df2a6fwlkj298GsWg86G76745ADdjnfsk}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400}
+      JWT_HEADER: Authorization
     networks:
       - microservice-network
     healthcheck:
