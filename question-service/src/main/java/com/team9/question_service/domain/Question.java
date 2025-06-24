@@ -45,6 +45,9 @@ public class Question { // 클래스 이름 변경: CSQuestion -> Question
     @Column(columnDefinition = "json")
     private Map<String, Object> hint; // JSON 타입의 힌트 (예: {"keyword": "TCP/IP"})
 
+    @Column(length = 50, unique = true)
+    private String keyword;
+
     // content, difficulty, hint 등을 수정할 수 있는 메서드 (필요시)
     public void update(String content, String difficulty, Map<String, Object> hint) {
         this.content = content;
