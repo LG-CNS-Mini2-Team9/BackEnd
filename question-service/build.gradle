@@ -27,7 +27,6 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	// docker-compose.yml에 redis가 있으므로 추가
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
 	// 2. 기존 의존성 유지
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
