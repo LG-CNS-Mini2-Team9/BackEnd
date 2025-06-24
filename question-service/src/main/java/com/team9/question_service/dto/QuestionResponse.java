@@ -20,8 +20,7 @@ public class QuestionResponse {
     private Category category;
     private LocalDateTime createdAt;
     private String content;
-    private String difficulty;
-    private Map<String, Object> hint;
+    private String hint;
     private boolean isSubmitted;
 
     /**
@@ -38,7 +37,6 @@ public class QuestionResponse {
                 .category(question.getCategory())
                 .createdAt(question.getCreatedAt())
                 .content(question.getContent())
-                .difficulty(question.getDifficulty())
                 .hint(question.getHint())
                 .isSubmitted(isSubmitted)
                 .build();

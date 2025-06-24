@@ -31,9 +31,12 @@ public class QuestionController {
         return ResponseEntity.ok(CustomResponse.ok(list));
     }
 
+    // X-User-Id 헤더를 받도록 수정
     @GetMapping("/{id}")
-    public ResponseEntity<CustomResponse<QuestionResponse>> getQuestionDetail(@PathVariable Long id) {
-        QuestionResponse question = questionService.getQuestionDetail(id);
+    public ResponseEntity<CustomResponse<QuestionResponse>> getQuestionDetail(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-User-Id", required = false) Long userId) { // userId 파라미터 추가
+        QuestionResponse question = questionService.getQuestionDetail(id, userId); // userId 전달
         return ResponseEntity.ok(CustomResponse.ok(question));
     }
 

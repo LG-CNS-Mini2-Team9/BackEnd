@@ -48,16 +48,19 @@ public class QuestionService {
             }
         }
 
-        // 3. DTO의 정적 팩토리 메서드를 사용하여 변환 로직을 위임합니다.
         return questions.map(q -> QuestionResponse.from(q, submittedQuestionsIds.contains(q.getId())));
     }
 
-    public QuestionResponse getQuestionDetail(Long id) {
+    // userId 파라미터 추가
+    public QuestionResponse getQuestionDetail(Long id, Long userId) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new CustomException(GeneralErrorCode._NOT_FOUND));
 
-        // 정적 팩토리 메서드를 사용하여 일관성을 유지합니다.
-        return QuestionResponse.from(question, false);
+        // userId가 있을 경우 isSubmitted를 판단
+        final Set<Long> submittedQuestionsIds = getSubmittedQuestionIds(userId);
+        boolean isSubmitted = submittedQuestionsIds.contains(question.getId());
+
+        return QuestionResponse.from(question, isSubmitted);
     }
 
     public QuestionResponse getTodayQuestion(Long userId) {
@@ -74,7 +77,6 @@ public class QuestionService {
         final Set<Long> submittedQuestionsIds = getSubmittedQuestionIds(userId);
         boolean isSubmitted = submittedQuestionsIds.contains(question.getId());
 
-        // 정적 팩토리 메서드를 사용하여 일관성을 유지합니다.
         return QuestionResponse.from(question, isSubmitted);
     }
 
@@ -85,12 +87,6 @@ public class QuestionService {
         question.deactivate();
     }
 
-    /**
-     * [내부 헬퍼 메서드] Feign Client를 사용하여 answer-service로부터 제출된 질문 ID 목록을 가져옵니다.
-     * MSA 통신 실패에 대비하여 견고하게 작성합니다.
-     * @param userId 조회할 사용자 ID
-     * @return 제출된 질문 ID의 Set, 실패 시 빈 Set 반환
-     */
     private Set<Long> getSubmittedQuestionIds(Long userId) {
         if (userId == null) {
             return Collections.emptySet();
