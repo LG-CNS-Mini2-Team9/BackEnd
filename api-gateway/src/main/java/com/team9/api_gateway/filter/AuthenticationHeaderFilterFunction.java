@@ -16,12 +16,6 @@ public class AuthenticationHeaderFilterFunction {
                 requestBuilder.header("X-Auth-UserId", userPrinciple.getUserId());
             }
 
-            String remoteAddr = "70.1.23.15";
-            requestBuilder.header("X-Client-Address", remoteAddr);
-
-            String device = "WEB";
-            requestBuilder.header("X-Client-Device", device);
-
             return requestBuilder.build();
         };
     }

@@ -9,14 +9,14 @@ import java.util.Collection;
 @Getter
 public class JwtAuthentication extends AbstractAuthenticationToken {
     private final String token; //credential
-    private final UserPrinciple principle;
+    private final UserPrincipal principal;
 
-    public JwtAuthentication( UserPrinciple principle, String token,
+    public JwtAuthentication( UserPrincipal principal, String token,
                              Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.token = token;
-        this.principle = principle;
-        this.setDetails(principle);
+        this.principal = principal;
+        this.setDetails(principal);
         setAuthenticated(true);
     }
 
@@ -31,7 +31,7 @@ public class JwtAuthentication extends AbstractAuthenticationToken {
     }
 
     @Override
-    public UserPrinciple getPrincipal() {
-        return principle;
+    public UserPrincipal getPrincipal() {
+        return principal;
     }
 }

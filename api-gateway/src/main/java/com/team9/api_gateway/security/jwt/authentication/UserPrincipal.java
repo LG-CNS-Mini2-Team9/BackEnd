@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Getter
 @RequiredArgsConstructor
-public class UserPrinciple implements Principal {
+public class UserPrincipal implements Principal {
     private final String userId;
 
     public boolean hasName() {
@@ -35,9 +35,9 @@ public class UserPrinciple implements Principal {
         if (another == null) return false;
         if (!getClass().isAssignableFrom(another.getClass())) return false;
 
-        UserPrinciple principle = (UserPrinciple) another;
+        UserPrincipal principal = (UserPrincipal) another;
 
-        return Objects.equals(userId, principle.getUserId());
+        return Objects.equals(userId, principal.getUserId());
     }
 
     @Override

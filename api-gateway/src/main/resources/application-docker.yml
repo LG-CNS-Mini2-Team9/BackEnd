@@ -3,35 +3,35 @@ spring:
     gateway:
       routes:
         - id: user-service
-          uri: lb://USER-SERVICE
+          uri: lb://user-service
           predicates:
             - Path=/api/users/**
           filters:
-            - AddAuthenticationHeader
+            - addAuthenticationHeader
         - id: question-service
-          uri: lb://QUESTION-SERVICE
+          uri: lb://question-service
           predicates:
             - Path=/api/questions/**
           filters:
-            - AddAuthenticationHeader
+            - addAuthenticationHeader
         - id: answer-service
-          uri: lb://ANSWER-SERVICE
+          uri: lb://answer-service
           predicates:
             - Path=/api/answers/**
           filters:
-            - AddAuthenticationHeader
+            - addAuthenticationHeader
         - id: ai-feedback-service
-          uri: lb://AI-FEEDBACK-SERVICE
+          uri: lb://ai-feedback-service
           predicates:
             - Path=/api/ai-feedback/**
           filters:
-            - AddAuthenticationHeader
+            - addAuthenticationHeader
         - id: statistic-service
-          uri: lb://STATISTIC-SERVICE
+          uri: lb://statistic-service
           predicates:
             - Path=/api/statistics/**
           filters:
-            - AddAuthenticationHeader
+            - addAuthenticationHeader
 
 eureka:
   client:
