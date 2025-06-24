@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@RequestMapping(value = "/backend/ai", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/internal/ai", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 @RequiredArgsConstructor
 public class AIQuestionController {

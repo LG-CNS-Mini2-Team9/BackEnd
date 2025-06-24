@@ -27,6 +27,7 @@ public class CSAnswerResponse {
     @Builder
     public static class CSAnswerDetailResponse {
         private String user_nickname;
+        private Long user_id;
         private Long csquestion_id;
         private Category csquestion_category;
         private String csquestion_content;
@@ -34,7 +35,16 @@ public class CSAnswerResponse {
         private String csanswer_content;
         private Long csanswer_score;
         private LocalDateTime csanswer_created_at;
-        private String csanswer_feedback;
+    }
+
+
+    @Data
+    @Builder
+    public static class CSStatisticResponse{
+        private Long csquestion_id;
+        private Category csquestion_category;
+        private Long csanswer_id;
+        private Long csanswer_score;
     }
 
 //    @Data
