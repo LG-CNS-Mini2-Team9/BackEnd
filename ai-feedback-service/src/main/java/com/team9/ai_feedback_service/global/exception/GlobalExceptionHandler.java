@@ -29,6 +29,12 @@ public class GlobalExceptionHandler {
                 .body(ApiResponseDto.createError("QUESTION_GENERATION_ERROR", e.getMessage()));
     }
 
+    @ExceptionHandler(AIFeedbackNotFoundException.class)
+    public ResponseEntity<String> handleAIFeedbackNotFound(AIFeedbackNotFoundException e) {
+        log.warn("AI Feedback not found: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseDto<String>> handleGeneralException(Exception e) {
         log.error("예상치 못한 예외 발생: {}", e.getMessage(), e);
