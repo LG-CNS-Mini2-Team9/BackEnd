@@ -16,24 +16,24 @@ spring:
       server:
         webmvc:
           routes:
-            - id: backend-user
-              predicates:
-                - Path=/api/user/**
-              uri: lb://backend-user
-              filters:
-                - AddAuthenticationHeader
-            - id: backend-alim
-              predicates:
-                - Path=/api/alim/**
-              uri: lb://backend-alim
-              filters:
-                - AddAuthenticationHeader
-            - id: backend-post
-              predicates:
-                - Path=/api/post/**
-              uri: lb://backend-post
-              filters:
-                - AddAuthenticationHeader
+#            - id: backend-user
+#              predicates:
+#                - Path=/api/user/**
+#              uri: lb://backend-user
+#              filters:
+#                - AddAuthenticationHeader
+#            - id: backend-alim
+#              predicates:
+#                - Path=/api/alim/**
+#              uri: lb://backend-alim
+#              filters:
+#                - AddAuthenticationHeader
+#            - id: backend-post
+#              predicates:
+#                - Path=/api/post/**
+#              uri: lb://backend-post
+#              filters:
+#                - AddAuthenticationHeader
 
 jwt:
   expires-in: 86400 # 1day

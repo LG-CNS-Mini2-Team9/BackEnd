@@ -8,10 +8,7 @@ import com.team9.api_gateway.common.dto.ApiResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -19,6 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+
+    @PostMapping("/test")
+    public ApiResponseDto<String> test() {
+        log.info("hello world");
+        return ApiResponseDto.createOk("hello world");
+    }
+
 
     @PostMapping("/login")
     public ApiResponseDto<TokenDto.AccessRefreshToken> login(@RequestBody @Valid LoginDto loginDto) {
