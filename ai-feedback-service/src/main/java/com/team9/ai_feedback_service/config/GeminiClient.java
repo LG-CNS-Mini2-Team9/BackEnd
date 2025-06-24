@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GeminiClient {
 
-    @Value("${gemini.api.model:gemini-2.5-flash-001}")
+    @Value("${gemini.api.model}")
     private String model;
 
     public final Client client;
