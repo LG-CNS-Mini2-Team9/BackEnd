@@ -8,7 +8,7 @@ import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Schema;
 import com.google.genai.types.Type;
 import com.team9.ai_feedback_service.config.GeminiClient;
-import com.team9.ai_feedback_service.domain.dto.QuestionResponseDto;
+import com.team9.ai_feedback_service.domain.dto.response.QuestionResponseDto;
 import com.team9.ai_feedback_service.global.exception.AIQuestionGenerationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
