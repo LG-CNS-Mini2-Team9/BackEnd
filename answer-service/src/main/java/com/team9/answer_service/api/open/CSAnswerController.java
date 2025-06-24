@@ -5,6 +5,8 @@ import com.team9.answer_service.domain.dto.CSAnswerResponse;
 import com.team9.answer_service.global.code.GeneralSuccessCode;
 import com.team9.answer_service.global.response.CustomResponse;
 import com.team9.answer_service.service.CSAnswerService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,12 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@Slf4j
 @RestController
-@RequestMapping("/answer")
+@RequestMapping(value = "/api/answer/v1", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
 public class CSAnswerController {
-
-    @Autowired
-    private CSAnswerService csAnswerService;
+    private final CSAnswerService csAnswerService;
 
     // 답변 작성
     @PostMapping
