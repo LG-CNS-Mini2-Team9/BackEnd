@@ -11,7 +11,6 @@ import com.team9.answer_service.remote.csquestion.RemoteCSQuestionService;
 import com.team9.answer_service.remote.user.RemoteUserService;
 import com.team9.answer_service.remote.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
@@ -47,7 +46,6 @@ public class CSAnswerService {
         CSAnswer answer = new CSAnswer();
         answer.setContent(request.getCsanswer_content());
         answer.setCreatedAt(LocalDateTime.now());
-        answer.setFeedback("아직 피드백 없음");
         answer.setScore(0L);
         answer.setCsQuestionId(request.getCsquestion_id());
         answer.setUserId(userId);
@@ -137,7 +135,6 @@ public class CSAnswerService {
         }
 
         answer.setContent(request.getCsanswer_content());
-        answer.setFeedback("아직 피드백 없음");
         answer.setScore(0L);
         csAnswerRepository.save(answer);
 
@@ -226,7 +223,6 @@ public class CSAnswerService {
                 .csanswer_content(answer.getContent())
                 .csanswer_score(answer.getScore())
                 .csanswer_created_at(answer.getCreatedAt())
-                .csanswer_feedback(answer.getFeedback())
                 .build();
     }
 

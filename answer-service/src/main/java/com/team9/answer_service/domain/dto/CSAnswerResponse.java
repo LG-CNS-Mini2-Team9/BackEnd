@@ -34,7 +34,6 @@ public class CSAnswerResponse {
         private String csanswer_content;
         private Long csanswer_score;
         private LocalDateTime csanswer_created_at;
-        private String csanswer_feedback;
     }
 
 
