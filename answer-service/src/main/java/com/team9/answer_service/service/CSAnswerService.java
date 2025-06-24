@@ -1,7 +1,11 @@
 package com.team9.answer_service.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.team9.answer_service.global.domain.Category;
 import com.team9.answer_service.remote.csquestion.dto.CSQuestionDto;
 import com.team9.answer_service.remote.csquestion.RemoteCSQuestionService;
 import com.team9.answer_service.remote.user.RemoteUserService;
@@ -151,6 +155,33 @@ public class CSAnswerService {
             throw new RuntimeException("자신의 답변만 삭제할 수 있습니다.");
         }
         csAnswerRepository.deleteById(answerId);
+    }
+
+    // 푼 문제 개수
+    public Long countSolvedQuestion(String categoryName, UserDetails userDetails) {
+
+        Long userId = getUserIdFromDetails(userDetails);
+        List<CSAnswer> answers = csAnswerRepository.findAllByUserId(userId);
+
+        Set<Long> distinctQuestionIds = answers.stream().map(CSAnswer::getCsQuestionId).collect(Collectors.toSet());
+
+        if (categoryName == null) {
+            return (long) distinctQuestionIds.size();
+        }
+
+        Long count = distinctQuestionIds.stream().filter(questionId -> {
+                    try {
+                        CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(questionId);
+                        return categoryName.equals(question.getCategory().name());
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .count();
+
+
+        return count;
+
     }
 
     private Long getUserIdFromDetails(UserDetails userDetails) {
