@@ -27,6 +27,7 @@ public class CSAnswerResponse {
     @Builder
     public static class CSAnswerDetailResponse {
         private String user_nickname;
+        private Long user_id;
         private Long csquestion_id;
         private Category csquestion_category;
         private String csquestion_content;

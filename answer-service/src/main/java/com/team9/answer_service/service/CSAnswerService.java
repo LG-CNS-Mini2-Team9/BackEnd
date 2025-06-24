@@ -51,7 +51,7 @@ public class CSAnswerService {
         answer.setUserId(userId);
 
         csAnswerRepository.save(answer);
-        return buildAnswerDetailResponse(answer, user.getNickname(), question);
+        return buildAnswerDetailResponse(answer, user, question);
     }
 
     // 내 답변 리스트 조회
@@ -114,7 +114,7 @@ public class CSAnswerService {
         // 답변 작성자 정보 조회
         UserDto.CSAnswerUserDto author = remoteUserService.getUserById(answer.getUserId());
 
-        return buildAnswerDetailResponse(answer, author.getNickname(), question);
+        return buildAnswerDetailResponse(answer, author, question);
     }
 
     // 답변 수정
@@ -138,7 +138,7 @@ public class CSAnswerService {
         answer.setScore(0L);
         csAnswerRepository.save(answer);
 
-        return buildAnswerDetailResponse(answer, user.getNickname(), question);
+        return buildAnswerDetailResponse(answer, user, question);
     }
 
     // 답변 삭제
@@ -213,9 +213,10 @@ public class CSAnswerService {
         return id;
     }
 
-    private CSAnswerResponse.CSAnswerDetailResponse buildAnswerDetailResponse(CSAnswer answer, String nickname, CSQuestionDto.Response question) {
+    private CSAnswerResponse.CSAnswerDetailResponse buildAnswerDetailResponse(CSAnswer answer, UserDto.CSAnswerUserDto user, CSQuestionDto.Response question) {
         return CSAnswerResponse.CSAnswerDetailResponse.builder()
-                .user_nickname(nickname)
+                .user_nickname(user.getNickname())
+                .user_id(user.getId())
                 .csquestion_id(question.getId())
                 .csquestion_category(question.getCategory())
                 .csquestion_content(question.getContent())
