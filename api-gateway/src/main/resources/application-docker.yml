@@ -1,37 +1,39 @@
 spring:
   cloud:
     gateway:
-      routes:
-        - id: user-service
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/api/users/**
-          filters:
-            - AddAuthenticationHeader
-        - id: question-service
-          uri: lb://QUESTION-SERVICE
-          predicates:
-            - Path=/api/questions/**
-          filters:
-            - AddAuthenticationHeader
-        - id: answer-service
-          uri: lb://ANSWER-SERVICE
-          predicates:
-            - Path=/api/answers/**
-          filters:
-            - AddAuthenticationHeader
-        - id: ai-feedback-service
-          uri: lb://AI-FEEDBACK-SERVICE
-          predicates:
-            - Path=/api/ai-feedback/**
-          filters:
-            - AddAuthenticationHeader
-        - id: statistic-service
-          uri: lb://STATISTIC-SERVICE
-          predicates:
-            - Path=/api/statistics/**
-          filters:
-            - AddAuthenticationHeader
+      server:
+        webmvc:
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/users/**
+              filters:
+                - addAuthenticationHeader
+            - id: question-service
+              uri: lb://question-service
+              predicates:
+                - Path=/api/questions/**
+              filters:
+                - addAuthenticationHeader
+            - id: answer-service
+              uri: lb://answer-service
+              predicates:
+                - Path=/api/answers/**
+              filters:
+                - addAuthenticationHeader
+            - id: ai-feedback-service
+              uri: lb://ai-feedback-service
+              predicates:
+                - Path=/api/ai-feedback/**
+              filters:
+                - addAuthenticationHeader
+            - id: statistic-service
+              uri: lb://statistic-service
+              predicates:
+                - Path=/api/statistics/**
+              filters:
+                - addAuthenticationHeader
 
 eureka:
   client:

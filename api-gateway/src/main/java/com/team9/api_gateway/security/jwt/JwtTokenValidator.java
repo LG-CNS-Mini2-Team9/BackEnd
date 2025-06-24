@@ -1,7 +1,7 @@
 package com.team9.api_gateway.security.jwt;
 
 import com.team9.api_gateway.security.jwt.authentication.JwtAuthentication;
-import com.team9.api_gateway.security.jwt.authentication.UserPrinciple;
+import com.team9.api_gateway.security.jwt.authentication.UserPrincipal;
 import com.team9.api_gateway.security.jwt.props.JwtConfigProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -81,9 +81,9 @@ public class JwtTokenValidator {
         }
 
         userId = claims.get("userId", String.class);
-        UserPrinciple principle = new UserPrinciple(userId);
+        UserPrincipal principal = new UserPrincipal(userId);
 
-        return new JwtAuthentication(principle, token, getGrantedAuthority("user"));
+        return new JwtAuthentication(principal, token, getGrantedAuthority("user"));
     }
 
     private String getAuthHeaderFromHeader(HttpServletRequest request) {
