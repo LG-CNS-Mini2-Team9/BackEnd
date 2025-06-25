@@ -30,7 +30,7 @@ public class AuthService {
             throw new BadParameter("사용자 아이디 또는 비밀번호를 확인하세요.");
         }
 
-        return jwtTokenGenerator.generateAccessRefreshToken(loginDto.getUserId(), "WEB");
+        return jwtTokenGenerator.generateAccessRefreshToken(loginDto.getEmail(), "WEB");
     }
 
     public TokenDto.AccessToken refresh(RefreshDto refreshDto) {
