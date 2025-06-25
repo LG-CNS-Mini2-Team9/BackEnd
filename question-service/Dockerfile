@@ -1,4 +1,5 @@
 FROM amazoncorretto:17
+RUN yum update -y && yum install -y curl && yum clean all
 MAINTAINER dev@team9.com
 VOLUME /tmp
 EXPOSE 8080
