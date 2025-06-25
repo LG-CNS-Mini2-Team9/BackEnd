@@ -47,11 +47,11 @@ project(':question-service') {
     }
 }
 
-project(':statistic-service') {
-    dependencies {
-        implementation project(':common')
-    }
-}
+//project(':statistic-service') {
+//    dependencies {
+//        implementation project(':common')
+//    }
+//}
 
 project(':user-service') {
     dependencies {

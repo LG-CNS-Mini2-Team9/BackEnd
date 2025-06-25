@@ -2,20 +2,20 @@ spring:
   application:
     name: statistic-service
 
-  datasource:
-    url: jdbc:mysql://localhost:3309/statistic_service
-    username: statistic_service
-    password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
+#  datasource:
+#    url: jdbc:mysql://localhost:3309/statistic_service
+#    username: statistic_service
+#    password: 1234
+#    driver-class-name: com.mysql.cj.jdbc.Driver
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
-    show-sql: true
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.MySQL8Dialect
+#        format_sql: true
+#    show-sql: true
 eureka:
   client:
     service-url:
@@ -29,3 +29,15 @@ server:
 logging:
   level:
     com.team9.statistic_service: DEBUG
+
+# Feign 설정
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+      answer-service:
+        url: http://localhost:8080  # answer-service의 주소
+        connectTimeout: 5000
+        readTimeout: 10000
