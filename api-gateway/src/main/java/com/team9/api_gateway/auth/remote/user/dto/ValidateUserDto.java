@@ -7,14 +7,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ValidateUserDto {
-    private String userId;
+    private String email;
 
     private String password;
 
     public static ValidateUserDto of(LoginDto loginDto) {
         ValidateUserDto validateUserDto = new ValidateUserDto();
 
-        validateUserDto.userId = loginDto.getUserId();
+        validateUserDto.email = loginDto.getEmail();
         validateUserDto.password = loginDto.getPassword();
 
         return validateUserDto;

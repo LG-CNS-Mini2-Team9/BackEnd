@@ -1,11 +1,11 @@
+// 루트 build.gradle에서 플러그인과 버전을 관리하므로, 여기서는 버전 정보를 제거합니다.
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.5.3'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot'
+	id 'io.spring.dependency-management'
 }
 
-group = 'com.team9'
-version = '0.0.1'
+// group과 version은 루트 build.gradle의 allprojects 설정에서 상속받으므로 생략합니다.
 
 java {
 	toolchain {
@@ -13,34 +13,33 @@ java {
 	}
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
 repositories {
 	mavenCentral()
 }
 
-ext {
-	set('springCloudVersion', "2025.0.0")
-}
+// ext 및 dependencyManagement 블록은 루트 build.gradle에서 관리하므로 생략합니다.
 
 dependencies {
+	// 1. 필수 의존성 추가
+	// 데이터베이스 연동을 위한 JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// 다른 서비스와 통신하기 위한 OpenFeign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	// 2. 기존 의존성 유지
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// 3. 기타 의존성
+	// MySQL 드라이버
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	// 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+	runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
 tasks.named('test') {
