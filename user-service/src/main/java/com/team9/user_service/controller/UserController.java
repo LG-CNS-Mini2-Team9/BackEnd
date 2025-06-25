@@ -1,13 +1,17 @@
 package com.team9.user_service.controller;
 
 import com.team9.common.dto.ApiResponseDto;
+import com.team9.user_service.domain.User;
 import com.team9.user_service.dto.request.LoginRequestDto;
 import com.team9.user_service.dto.request.SignUpRequestDto;
+import com.team9.user_service.dto.request.UpdateUserRequestDto;
+import com.team9.user_service.dto.response.UserAnswerDto;
 import com.team9.user_service.dto.request.UpdateUserProfileRequestDto;
 import com.team9.user_service.dto.response.UserProfileResponseDto;
 import com.team9.user_service.global.code.GeneralErrorCode;
 import com.team9.user_service.global.code.GeneralSuccessCode;
 import com.team9.user_service.global.response.CustomResponse;
+import com.team9.user_service.repository.UserRepository;
 import com.team9.user_service.service.S3Service;
 import com.team9.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +36,9 @@ public class UserController {
     AuthenticationManager authManager;
     @Autowired
     S3Service s3Service;
+
+    @Autowired
+    UserRepository userRepository;
 
     // 회원가입
     @PostMapping("/api/users/signup")
@@ -71,6 +79,14 @@ public class UserController {
         } else {
             return ApiResponseDto.createError("NOT_FOUND", "사용자를 찾을 수 없습니다.");
         }
+    }
+
+
+    @GetMapping(value = "/backend/user/v1/email/{email}")
+    Long getUserIdByEmail(@PathVariable("email") String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return user.getId();
     }
 
     // 회원 탈퇴

@@ -1,7 +1,7 @@
 services:
   # Eureka 서비스 디스커버리
   eureka-server:
-    build: 
+    build:
       context: ./eureka-service
       dockerfile: Dockerfile
     container_name: eureka-server
@@ -201,6 +201,9 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-your-aws-access-key}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-your-aws-secret-key}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET:-your-s3-bucket-name}
+      cloud.aws.credentials.access-key: ${AWS_ACCESS_KEY_ID:-your-aws-access-key}
+      cloud.aws.credentials.secret-key: ${AWS_SECRET_ACCESS_KEY:-your-aws-secret-key}
+      cloud.aws.s3.bucket: ${AWS_S3_BUCKET:-your-s3-bucket-name}
     networks:
       - microservice-network
     healthcheck:

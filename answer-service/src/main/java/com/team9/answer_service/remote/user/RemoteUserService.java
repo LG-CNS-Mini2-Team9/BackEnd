@@ -10,9 +10,6 @@ import java.util.Optional;
 
 @FeignClient(name = "user-service", path="/internal/user")
 public interface RemoteUserService {
-    @GetMapping(value = "/{userId}")
+    @GetMapping(value = "/id/{userId}")
     UserDto.CSAnswerUserDto getUserById(@PathVariable("userId") Long userId);
-
-    @GetMapping(value="/{email}")
-    Long getUserIdByEmail(@PathVariable("email") String email);
 }

@@ -19,16 +19,9 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -44,9 +37,9 @@ public class CSAnswerController {
     @PostMapping
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> createAnswer(
             @RequestBody CSAnswerRequest.CSAnswerCreateRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @RequestHeader(value = "X-Auth-UserId") Long userId) {
 
-        CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.createAnswer(request, userDetails);
+        CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.createAnswer(request, userId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CustomResponse.created(response));
@@ -55,7 +48,7 @@ public class CSAnswerController {
     // 내 답변 리스트 조회 (모든/질문별)
     @GetMapping(value = "/my")
     public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readMyAnswerList(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestHeader(value = "X-Auth-UserId") Long userId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(required = false) Long questionId
     ) {
@@ -63,14 +56,14 @@ public class CSAnswerController {
         Sort sort = Sort.by(order);
         Pageable pageable = PageRequest.of(page - 1, 10, sort);
 
-        Page<CSAnswerResponse.CSAnswerListResponse> responseList = csAnswerService.getMyAnswerList(userDetails, pageable, questionId);
+        Page<CSAnswerResponse.CSAnswerListResponse> responseList = csAnswerService.getMyAnswerList(userId, pageable, questionId);
         return ResponseEntity.ok(CustomResponse.ok(responseList));
     }
 
     // 질문별 답변 리스트 조회
     @GetMapping(value = "/{questionId}")
     public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readAnswerList(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestHeader(value = "X-Auth-UserId") Long userId,
             @RequestParam(defaultValue = "1") int page,
             @PathVariable Long questionId
     ) {
@@ -78,7 +71,7 @@ public class CSAnswerController {
         Sort sort = Sort.by(order);
         Pageable pageable = PageRequest.of(page - 1, 10, sort);
 
-        Page<CSAnswerResponse.CSAnswerListResponse> responseList = csAnswerService.getAnswerList(userDetails, pageable, questionId);
+        Page<CSAnswerResponse.CSAnswerListResponse> responseList = csAnswerService.getAnswerList(userId, pageable, questionId);
         return ResponseEntity.ok(CustomResponse.ok(responseList));
     }
 
@@ -86,8 +79,8 @@ public class CSAnswerController {
     @GetMapping("/detail/{answerId}")
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> readAnswer(
             @PathVariable Long answerId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.getAnswerDetail(answerId, userDetails);
+            @RequestHeader(value = "X-Auth-UserId") Long userId) {
+        CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.getAnswerDetail(answerId, userId);
         return ResponseEntity.ok(CustomResponse.ok(response));
     }
 
@@ -96,9 +89,9 @@ public class CSAnswerController {
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> updateAnswer(
             @PathVariable Long answerId,
             @RequestBody CSAnswerRequest.CSAnswerUpdate request,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @RequestHeader(value = "X-Auth-UserId") Long userId) {
 
-        CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.updateAnswer(answerId, request, userDetails);
+        CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.updateAnswer(answerId, request, userId);
 
         // 피드백 생성
         FeedbackScoreResponseDto feedback = csAnswerService.createFeedback(response.getCsquestion_id(), response.getCsanswer_id(), response.getCsanswer_content());
@@ -108,8 +101,8 @@ public class CSAnswerController {
 
     // 답변 삭제
     @PostMapping("/{answerId}/delete")
-    public ResponseEntity<CustomResponse<Void>> deleteAnswer(@PathVariable Long answerId, @AuthenticationPrincipal UserDetails userDetails) {
-        csAnswerService.deleteAnswer(answerId, userDetails);
+    public ResponseEntity<CustomResponse<Void>> deleteAnswer(@PathVariable Long answerId, @RequestHeader(value = "X-Auth-UserId") Long userId) {
+        csAnswerService.deleteAnswer(answerId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CustomResponse.success(GeneralSuccessCode._DELETED, null));
     }

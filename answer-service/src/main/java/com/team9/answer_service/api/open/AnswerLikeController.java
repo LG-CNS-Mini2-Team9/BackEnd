@@ -10,11 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -36,8 +32,8 @@ public class AnswerLikeController {
     }
 
     @GetMapping
-    public ResponseEntity<CustomResponse<LikeResponse>> getLikeCount(@AuthenticationPrincipal UserDetails userDetails, Long answerId){
-        return ResponseEntity.ok(CustomResponse.ok(likeService.getLikes(userDetails, answerId)));
+    public ResponseEntity<CustomResponse<LikeResponse>> getLikeCount(@RequestHeader(value = "X-Auth-UserId") Long userId, Long answerId){
+        return ResponseEntity.ok(CustomResponse.ok(likeService.getLikes(userId, answerId)));
     }
 
 

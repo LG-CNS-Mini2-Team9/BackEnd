@@ -1,15 +1,13 @@
 package com.team9.user_service.controller.internal;
 
+import com.team9.common.dto.ApiResponseDto;
 import com.team9.user_service.domain.User;
 import com.team9.user_service.dto.response.UserAnswerDto;
 import com.team9.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -19,8 +17,7 @@ import java.util.Optional;
 @RequestMapping("/internal/user")
 public class InternalUserController {
     private final UserRepository userRepository;
-
-    @GetMapping(value = "/{userId}")
+    @GetMapping(value = "/id/{userId}")
     UserAnswerDto getUserById(@PathVariable("userId") Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -31,11 +28,6 @@ public class InternalUserController {
         return userAnswerDto;
     }
 
-    @GetMapping(value = "/{email}")
-    Long getUserIdByEmail(@PathVariable("email") String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
-        return user.getId();
-    }
 
 }
