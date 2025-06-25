@@ -39,6 +39,19 @@ public class QuestionController {
         QuestionResponse question = questionService.getQuestionDetail(id, userId); // userId 전달
         return ResponseEntity.ok(CustomResponse.ok(question));
     }
+    /**
+     * 로그인한 사용자에게 개인화된 질문을 추천합니다.
+     * 비로그인 시에는 오늘의 질문을 반환합니다.
+     *
+     * @param userId API Gateway에서 전달하는 사용자 ID
+     * @return 추천 질문 DTO
+     */
+    @GetMapping("/recommend")
+    public ResponseEntity<CustomResponse<QuestionResponse>> getRecommendedQuestion(
+            @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        QuestionResponse question = questionService.getRecommendedQuestion(userId);
+        return ResponseEntity.ok(CustomResponse.ok(question));
+    }
 
     @GetMapping("/today")
     public ResponseEntity<CustomResponse<QuestionResponse>> getTodayQuestion(

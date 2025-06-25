@@ -31,6 +31,16 @@ import static org.mockito.Mockito.times;
 @DisplayName("api-gateway 로그인/갱신 테스트")
 class AuthServiceTest {
 
+//package com.team9.api_gateway.auth.service;
+//
+//import com.team9.api_gateway.auth.dto.LoginDto;
+//import com.team9.api_gateway.auth.dto.RefreshDto;
+//import com.team9.api_gateway.auth.jwt.TokenGenerator;
+//import com.team9.api_gateway.auth.jwt.TokenValidator;
+//import com.team9.api_gateway.auth.jwt.dto.TokenDto;
+//import com.team9.api_gateway.auth.remote.user.RemoteUserService;
+//import com.team9.api_gateway.auth.remote.user.dto.ValidateUserDto;
+
 //    @Mock
 //    private TokenGenerator jwtTokenGenerator;
 //
@@ -53,7 +63,6 @@ class AuthServiceTest {
 //        @BeforeEach
 //        void setUp() {
 //            loginDto = new LoginDto();
-//            loginDto.setEmail("testUser");
 //            loginDto.setPassword("testPassword");
 //
 //            TokenDto.JwtToken access = new TokenDto.JwtToken("accessToken", 1000);
