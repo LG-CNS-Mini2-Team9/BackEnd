@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 public class AwsS3Config {
-    @Value("${cloud.aws.credentials.access.key}") // application.yml 에 명시한 내용
+    @Value("${cloud.aws.credentials.access-key}") // application.yml 에 명시한 내용
     private String accessKey;
 
-    @Value("${cloud.aws.credentials.access.secret.key}")
+    @Value("${cloud.aws.credentials.secret-key}")
     private String secretKey;
 
     @Bean
