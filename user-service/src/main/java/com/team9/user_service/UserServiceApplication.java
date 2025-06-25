@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableDiscoveryClient
 @SpringBootApplication
-@EnableFeignClients(basePackages = "com.team9.user_service.remote")
+@EnableFeignClients
 public class UserServiceApplication {
 
 	public static void main(String[] args) {

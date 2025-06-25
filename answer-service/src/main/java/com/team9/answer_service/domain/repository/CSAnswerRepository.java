@@ -16,4 +16,5 @@ public interface CSAnswerRepository extends JpaRepository<CSAnswer, Long>{
     Page<CSAnswer> findAllByUserIdAndCsQuestionId(Long userId, Long csQuestionId, Pageable pageable);
     Page<CSAnswer> findAllByCsQuestionId(Long csQuestionId, Pageable pageable);
     boolean existsByUserIdAndCsQuestionId(Long userId, Long csQuestionId);
+    void deleteAllByUserId(Long userId);
 }

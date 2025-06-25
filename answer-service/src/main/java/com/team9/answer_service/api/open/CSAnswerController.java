@@ -6,6 +6,7 @@ import com.team9.answer_service.domain.dto.CSAnswerResponse;
 import com.team9.answer_service.domain.repository.CSAnswerRepository;
 import com.team9.answer_service.global.code.GeneralSuccessCode;
 import com.team9.answer_service.global.response.CustomResponse;
+import com.team9.answer_service.remote.ai.dto.FeedbackScoreResponseDto;
 import com.team9.answer_service.service.CSAnswerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/answers/v1", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/answers", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class CSAnswerController {
     private final CSAnswerService csAnswerService;
@@ -46,7 +47,7 @@ public class CSAnswerController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.createAnswer(request, userDetails);
-        System.out.println("응답 데이터: " + response);
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CustomResponse.created(response));
     }
@@ -98,6 +99,10 @@ public class CSAnswerController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.updateAnswer(answerId, request, userDetails);
+
+        // 피드백 생성
+        FeedbackScoreResponseDto feedback = csAnswerService.createFeedback(response.getCsquestion_id(), response.getCsanswer_id(), response.getCsanswer_content());
+        response.setCsanswer_score(feedback.getScore());
         return ResponseEntity.ok(CustomResponse.ok(response));
     }
 
@@ -110,7 +115,7 @@ public class CSAnswerController {
     }
 
     @GetMapping("/test")
-    public List<CSAnswer> test(){
+    public List<CSAnswer> test() {
         return csAnswerRepository.findAll();
     }
 }

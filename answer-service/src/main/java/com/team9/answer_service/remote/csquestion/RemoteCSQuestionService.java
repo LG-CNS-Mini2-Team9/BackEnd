@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "backend-question", path="/internal/questions")
+@FeignClient(name = "question-service", path="/internal/questions")
 public interface RemoteCSQuestionService {
     @GetMapping(value="/{questionId}")
     CSQuestionDto.Response getQuestionById(@PathVariable("questionId") Long questionId);

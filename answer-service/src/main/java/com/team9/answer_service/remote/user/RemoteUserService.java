@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Optional;
 
-@FeignClient(name = "backend-user", path="/backend/user/v1")
+@FeignClient(name = "user-service", path="/internal/user")
 public interface RemoteUserService {
     @GetMapping(value = "/{userId}")
     UserDto.CSAnswerUserDto getUserById(@PathVariable("userId") Long userId);
