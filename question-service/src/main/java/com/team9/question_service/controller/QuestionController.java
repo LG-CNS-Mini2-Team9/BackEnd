@@ -26,7 +26,7 @@ public class QuestionController {
     public ResponseEntity<CustomResponse<Page<QuestionResponse>>> getQuestionList(
             @RequestParam(required = false) String category,
             Pageable pageable,
-            @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) {
         Page<QuestionResponse> list = questionService.getQuestionList(category, pageable, userId);
         return ResponseEntity.ok(CustomResponse.ok(list));
     }
@@ -35,7 +35,7 @@ public class QuestionController {
     @GetMapping("/{id}")
     public ResponseEntity<CustomResponse<QuestionResponse>> getQuestionDetail(
             @PathVariable Long id,
-            @RequestHeader(value = "X-User-Id", required = false) Long userId) { // userId 파라미터 추가
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) { // userId 파라미터 추가
         QuestionResponse question = questionService.getQuestionDetail(id, userId); // userId 전달
         return ResponseEntity.ok(CustomResponse.ok(question));
     }
@@ -48,14 +48,14 @@ public class QuestionController {
      */
     @GetMapping("/recommend")
     public ResponseEntity<CustomResponse<QuestionResponse>> getRecommendedQuestion(
-            @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) {
         QuestionResponse question = questionService.getRecommendedQuestion(userId);
         return ResponseEntity.ok(CustomResponse.ok(question));
     }
 
     @GetMapping("/today")
     public ResponseEntity<CustomResponse<QuestionResponse>> getTodayQuestion(
-            @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) {
         QuestionResponse question = questionService.getTodayQuestion(userId);
         return ResponseEntity.ok(CustomResponse.ok(question));
     }
@@ -70,7 +70,7 @@ public class QuestionController {
     public ResponseEntity<CustomResponse<Page<QuestionResponse>>> getQuestionsByCategory(
             @PathVariable String category,
             Pageable pageable,
-            @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) {
         Page<QuestionResponse> list = questionService.getQuestionList(category, pageable, userId);
         return ResponseEntity.ok(CustomResponse.ok(list));
     }
