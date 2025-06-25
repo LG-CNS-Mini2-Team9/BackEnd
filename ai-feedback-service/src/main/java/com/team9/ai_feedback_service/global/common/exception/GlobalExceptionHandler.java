@@ -1,6 +1,8 @@
-package com.team9.ai_feedback_service.global.exception;
+package com.team9.ai_feedback_service.global.common.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.team9.ai_feedback_service.global.exception.AIFeedbackNotFoundException;
+import com.team9.ai_feedback_service.global.exception.AIQuestionGenerationException;
 import com.team9.common.dto.ApiResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
