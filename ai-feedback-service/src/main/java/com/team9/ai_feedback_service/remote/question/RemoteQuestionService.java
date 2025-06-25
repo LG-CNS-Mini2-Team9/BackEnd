@@ -13,5 +13,5 @@ public interface RemoteQuestionService {
     @GetMapping("/{id}")
     CustomResponse<QuestionResponse> getQuestionDetail(
             @PathVariable Long id,
-            @RequestHeader(value = "X-User-Id", required = false) Long userId);
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId);
 }

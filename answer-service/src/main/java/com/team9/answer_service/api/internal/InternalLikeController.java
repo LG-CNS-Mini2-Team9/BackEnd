@@ -21,7 +21,7 @@ public class InternalLikeController {
 
     // 내가 받은 좋아요 수 (마이페이지용)
     @GetMapping("/my")
-    public ResponseEntity<CustomResponse<Long>> countMyTotalLikes(@RequestHeader(value = "X-User-Id") Long userId){
+    public ResponseEntity<CustomResponse<Long>> countMyTotalLikes(@RequestHeader(value = "X-Auth-UserId") Long userId){
         Long count = likeService.countMyAnswerLikes(userId);
         return ResponseEntity.ok(CustomResponse.ok(count));
     }

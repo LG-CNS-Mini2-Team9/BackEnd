@@ -37,7 +37,7 @@ public class CSAnswerController {
     @PostMapping
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> createAnswer(
             @RequestBody CSAnswerRequest.CSAnswerCreateRequest request,
-            @RequestHeader(value = "X-User-Id") Long userId) {
+            @RequestHeader(value = "X-Auth-UserId") Long userId) {
 
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.createAnswer(request, userId);
 
@@ -48,7 +48,7 @@ public class CSAnswerController {
     // 내 답변 리스트 조회 (모든/질문별)
     @GetMapping(value = "/my")
     public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readMyAnswerList(
-            @RequestHeader(value = "X-User-Id") Long userId,
+            @RequestHeader(value = "X-Auth-UserId") Long userId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(required = false) Long questionId
     ) {
@@ -63,7 +63,7 @@ public class CSAnswerController {
     // 질문별 답변 리스트 조회
     @GetMapping(value = "/{questionId}")
     public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readAnswerList(
-            @RequestHeader(value = "X-User-Id") Long userId,
+            @RequestHeader(value = "X-Auth-UserId") Long userId,
             @RequestParam(defaultValue = "1") int page,
             @PathVariable Long questionId
     ) {
@@ -79,7 +79,7 @@ public class CSAnswerController {
     @GetMapping("/detail/{answerId}")
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> readAnswer(
             @PathVariable Long answerId,
-            @RequestHeader(value = "X-User-Id") Long userId) {
+            @RequestHeader(value = "X-Auth-UserId") Long userId) {
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.getAnswerDetail(answerId, userId);
         return ResponseEntity.ok(CustomResponse.ok(response));
     }
@@ -89,7 +89,7 @@ public class CSAnswerController {
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> updateAnswer(
             @PathVariable Long answerId,
             @RequestBody CSAnswerRequest.CSAnswerUpdate request,
-            @RequestHeader(value = "X-User-Id") Long userId) {
+            @RequestHeader(value = "X-Auth-UserId") Long userId) {
 
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.updateAnswer(answerId, request, userId);
 
@@ -101,7 +101,7 @@ public class CSAnswerController {
 
     // 답변 삭제
     @PostMapping("/{answerId}/delete")
-    public ResponseEntity<CustomResponse<Void>> deleteAnswer(@PathVariable Long answerId, @RequestHeader(value = "X-User-Id") Long userId) {
+    public ResponseEntity<CustomResponse<Void>> deleteAnswer(@PathVariable Long answerId, @RequestHeader(value = "X-Auth-UserId") Long userId) {
         csAnswerService.deleteAnswer(answerId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CustomResponse.success(GeneralSuccessCode._DELETED, null));

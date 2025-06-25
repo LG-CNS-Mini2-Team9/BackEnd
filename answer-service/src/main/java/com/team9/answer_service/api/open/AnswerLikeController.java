@@ -32,7 +32,7 @@ public class AnswerLikeController {
     }
 
     @GetMapping
-    public ResponseEntity<CustomResponse<LikeResponse>> getLikeCount(@RequestHeader(value = "X-User-Id") Long userId, Long answerId){
+    public ResponseEntity<CustomResponse<LikeResponse>> getLikeCount(@RequestHeader(value = "X-Auth-UserId") Long userId, Long answerId){
         return ResponseEntity.ok(CustomResponse.ok(likeService.getLikes(userId, answerId)));
     }
 
