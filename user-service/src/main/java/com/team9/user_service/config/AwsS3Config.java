@@ -15,13 +15,13 @@ public class AwsS3Config {
     @Value("${cloud.aws.credentials.access.key}") // application.yml 에 명시한 내용
     private String accessKey;
 
-    @Value("${cloud.aws.credentials.secret.key}")
+    @Value("${cloud.aws.credentials.access.secret.key}")
     private String secretKey;
 
     @Bean
     public AmazonS3Client amazonS3Client() {
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
-        String region = "ap-northeast-2";
+        String region = "${cloud.aws.region.static}";
         return (AmazonS3Client) AmazonS3ClientBuilder.standard()
                 .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
