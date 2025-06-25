@@ -43,7 +43,7 @@ public class AIQuestionCreationService {
 
         // 3. Feign Client를 통해 ai-feedback-service에 질문 생성을 요청합니다.
         AiGenerationRequestDto request = new AiGenerationRequestDto(randomCategory.name(), existingKeywords);
-        AiCreatedQuestionDto newQuestionDto = aiFeedbackServiceClient.generateQuestion(request).getData();
+        AiCreatedQuestionDto newQuestionDto = aiFeedbackServiceClient.generateQuestion(request).getResult();
 
         // 4. 받은 결과로 Question 엔티티를 생성하고 DB에 저장합니다.
         Question newQuestion = Question.builder()
