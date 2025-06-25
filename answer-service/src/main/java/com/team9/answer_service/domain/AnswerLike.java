@@ -9,10 +9,6 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(
-        name = "answer_like",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "answer_id"})}
-)
 @NoArgsConstructor
 public class AnswerLike {
     @Id
@@ -25,12 +21,16 @@ public class AnswerLike {
     @Column(name = "answer_id", nullable = false)
     private Long answerId;
 
+    @Column(name="author_id", nullable = false)
+    private Long authorId;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public AnswerLike(Long userId, Long answerId){
+    public AnswerLike(Long userId, Long answerId, Long authorId){
         this.userId = userId;
         this.answerId = answerId;
+        this.authorId = authorId;
     }
 
     @PrePersist

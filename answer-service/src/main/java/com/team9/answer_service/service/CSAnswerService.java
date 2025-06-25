@@ -184,22 +184,24 @@ public class CSAnswerService {
 
     // 통계를 위한 내 답변들 받아오기
     // 평균점수, 카테고리별 평균점수, 카테고리별 푼 문제 수 통계 서비스에서 구할 수 있게 데이터 전달
-    public List<CSAnswerResponse.CSStatisticResponse> getStatisticAnswers(UserDetails userDetails) {
+    public List<CSAnswerResponse.CSStatisticResponse> getStatisticAnswers(UserDetails userDetails, String categoryName) {
         Long userId = getUserIdFromDetails(userDetails);
+
         List<CSAnswer> answers = csAnswerRepository.findAllByUserId(userId);
 
         List<CSAnswerResponse.CSStatisticResponse> statisticAnswers = answers.stream().map((answer) ->
-        {
-            CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(answer.getCsQuestionId());
+                {
+                    CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(answer.getCsQuestionId());
 
-
-            return CSAnswerResponse.CSStatisticResponse.builder()
-                    .csanswer_id(answer.getId())
-                    .csanswer_score(answer.getScore())
-                    .csquestion_id(answer.getCsQuestionId())
-                    .csquestion_category(question.getCategory())
-                    .build();
-        }).toList();
+                    return CSAnswerResponse.CSStatisticResponse.builder()
+                            .csanswer_id(answer.getId())
+                            .csanswer_score(answer.getScore())
+                            .csquestion_id(answer.getCsQuestionId())
+                            .csquestion_category(question.getCategory())
+                            .build();
+                })
+                .filter(res -> categoryName == null || res.getCsquestion_category().name().equalsIgnoreCase(categoryName))
+                .toList();
 
         return statisticAnswers;
     }
