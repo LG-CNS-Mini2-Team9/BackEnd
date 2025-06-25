@@ -31,4 +31,6 @@ public class BackendCSAnswerController {
     public List<CSAnswerResponse.CSStatisticResponse> getAnswers(@AuthenticationPrincipal UserDetails userDetails){
         return csAnswerService.getStatisticAnswers(userDetails);
     }
+
+    // TODO: 카테고리별로 답변 목록을 조회
 }
