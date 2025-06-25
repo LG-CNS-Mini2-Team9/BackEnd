@@ -1,3 +1,36 @@
+package com.team9.api_gateway.auth.service;
+
+import com.team9.api_gateway.auth.dto.LoginDto;
+import com.team9.api_gateway.auth.dto.RefreshDto;
+import com.team9.api_gateway.auth.jwt.TokenGenerator;
+import com.team9.api_gateway.auth.jwt.TokenValidator;
+import com.team9.api_gateway.auth.jwt.dto.TokenDto;
+import com.team9.api_gateway.auth.remote.user.RemoteUserService;
+import com.team9.api_gateway.auth.remote.user.dto.ValidateUserDto;
+import com.team9.api_gateway.common.dto.ApiResponseDto;
+import com.team9.api_gateway.common.exception.BadParameter;
+import com.team9.api_gateway.common.exception.NotFound;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("api-gateway 로그인/갱신 테스트")
+class AuthServiceTest {
+
 //package com.team9.api_gateway.auth.service;
 //
 //import com.team9.api_gateway.auth.dto.LoginDto;
@@ -7,30 +40,7 @@
 //import com.team9.api_gateway.auth.jwt.dto.TokenDto;
 //import com.team9.api_gateway.auth.remote.user.RemoteUserService;
 //import com.team9.api_gateway.auth.remote.user.dto.ValidateUserDto;
-//import com.team9.api_gateway.common.dto.ApiResponseDto;
-//import com.team9.api_gateway.common.exception.BadParameter;
-//import com.team9.api_gateway.common.exception.NotFound;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Nested;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.assertj.core.api.Assertions.assertThatThrownBy;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.eq;
-//import static org.mockito.BDDMockito.given;
-//import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.times;
-//
-//@ExtendWith(MockitoExtension.class)
-//@DisplayName("api-gateway 로그인/갱신 테스트")
-//class AuthServiceTest {
-//
+
 //    @Mock
 //    private TokenGenerator jwtTokenGenerator;
 //
@@ -53,7 +63,6 @@
 //        @BeforeEach
 //        void setUp() {
 //            loginDto = new LoginDto();
-//            loginDto.setUserId("testUser");
 //            loginDto.setPassword("testPassword");
 //
 //            TokenDto.JwtToken access = new TokenDto.JwtToken("accessToken", 1000);
@@ -167,4 +176,4 @@
 //            verify(jwtTokenGenerator, times(0)).generateAccessToken(any(), any());
 //        }
 //    }
-//}
+}
