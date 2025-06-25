@@ -62,14 +62,9 @@ public class UserService {
 
     // 로그인
     public boolean validateCredentials(String email, String password) {
-        try {
-            authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(email, password)
-            );
-            return true;
-        } catch (AuthenticationException e) {
-            return false;
-        }
+        Optional<User> user = userRepository.findByEmail(email);
+
+        return user.map(value -> value.getPassword().equals(password)).orElse(false);
     }
 
     // 리프레시

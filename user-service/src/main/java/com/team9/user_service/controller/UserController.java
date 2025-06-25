@@ -66,7 +66,7 @@ public class UserController {
     }
 
     // 리프레시 (api-gateway)
-    @GetMapping("/backend/user/v1/user/{userId}")
+    @GetMapping("/backend/user/v1/exists/{userId}")
     public ApiResponseDto<String> exists(@PathVariable String userId) {
         if (userService.existsById(userId)) {
             return ApiResponseDto.defaultOk();
