@@ -12,7 +12,4 @@ import java.util.Optional;
 public interface RemoteUserService {
     @GetMapping(value = "/id/{userId}")
     UserDto.CSAnswerUserDto getUserById(@PathVariable("userId") Long userId);
-
-    @GetMapping(value="/email/{email}")
-    Long getUserIdByEmail(@PathVariable("email") String email);
 }

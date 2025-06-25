@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "user-service", path = "/internal/user")
+@FeignClient(name = "user-service", path = "/backend/user/v1")
 public interface RemoteUserService {
     @GetMapping("/exists/{userId}")
     public ApiResponseDto<String> exists(@PathVariable String userId);
