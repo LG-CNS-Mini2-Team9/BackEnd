@@ -9,7 +9,8 @@ import com.google.genai.types.Schema;
 import com.google.genai.types.Type;
 import com.team9.ai_feedback_service.config.GeminiClient;
 import com.team9.ai_feedback_service.domain.dto.response.QuestionResponseDto;
-import com.team9.ai_feedback_service.global.exception.AIQuestionGenerationException;
+import com.team9.ai_feedback_service.global.common.code.AIQuestionErrorCode;
+import com.team9.ai_feedback_service.global.common.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class AIQuestionService {
             String result = response.text();
 
             if (result == null || result.trim().isEmpty()) {
-                throw AIQuestionGenerationException.invalidResponse();
+                throw CustomException.of(AIQuestionErrorCode.AI_QUESTION_INVALID_RESPONSE);
             }
 
             log.info("\n=======질문 생성=======\n" + result);
@@ -58,10 +59,10 @@ public class AIQuestionService {
             return questionResponseDto;
 
         } catch (JsonProcessingException e) {
-            throw AIQuestionGenerationException.invalidResponse();
+            throw CustomException.of(AIQuestionErrorCode.AI_QUESTION_INVALID_RESPONSE);
 
         } catch (Exception e) {
-            throw AIQuestionGenerationException.apiCallFailed(e.getMessage());
+            throw CustomException.of(AIQuestionErrorCode.AI_QUESTION_API_FAILED);
         }
 
     }
