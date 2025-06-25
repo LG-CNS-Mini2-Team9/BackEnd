@@ -3,9 +3,10 @@ package com.team9.ai_feedback_service.global.common.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.team9.common.code.BaseCode;
-import com.team9.common.code.BaseErrorCode;
-import com.team9.common.code.GeneralSuccessCode;
+
+import com.team9.ai_feedback_service.global.common.code.BaseCode;
+import com.team9.ai_feedback_service.global.common.code.BaseErrorCode;
+import com.team9.ai_feedback_service.global.common.code.GeneralSuccessCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
