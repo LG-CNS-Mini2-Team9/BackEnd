@@ -186,4 +186,8 @@ public class UserService {
 
     }
 
+    public boolean existsById(String userId) {
+        return userRepository.existsByEmail(userId);
+    }
+
 }

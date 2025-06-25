@@ -18,14 +18,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Map;
 
 @RestController
 public class UserController {
@@ -111,4 +107,31 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(CustomResponse.ok("로그아웃 완료"));
     }
+
+    // 유저 존재 여부 확인
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<CustomResponse<String>> exists(@PathVariable String userId) {
+        boolean exists = userService.existsById(userId);  // 이 함수는 아래에서 추가
+        if (exists) {
+            return ResponseEntity.ok(CustomResponse.ok("존재하는 사용자입니다."));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(CustomResponse.fail(GeneralErrorCode._NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        }
+    }
+
+    // 로그인 인증 검증 (비밀번호 검증)
+    @PostMapping("/validate")
+    public ResponseEntity<CustomResponse<String>> validate(@RequestBody LoginRequestDto dto) {
+        try {
+            Authentication authentication = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
+            );
+            return ResponseEntity.ok(CustomResponse.ok("사용자 인증 성공"));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CustomResponse.fail(GeneralErrorCode._UNAUTHORIZED, "인증 실패: 잘못된 정보입니다."));
+        }
+    }
+
 }
