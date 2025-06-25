@@ -20,7 +20,7 @@ import java.util.Optional;
 public class InternalUserController {
     private final UserRepository userRepository;
 
-    @GetMapping(value = "/{userId}")
+    @GetMapping(value = "/id/{userId}")
     UserAnswerDto getUserById(@PathVariable("userId") Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -31,7 +31,7 @@ public class InternalUserController {
         return userAnswerDto;
     }
 
-    @GetMapping(value = "/{email}")
+    @GetMapping(value = "/email/{email}")
     Long getUserIdByEmail(@PathVariable("email") String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 

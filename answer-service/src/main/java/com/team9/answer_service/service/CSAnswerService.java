@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.team9.answer_service.global.domain.Category;
+import com.team9.answer_service.global.response.CustomResponse;
 import com.team9.answer_service.remote.ai.RemoteAIFeedbackService;
 import com.team9.answer_service.remote.ai.dto.FeedbackRequestDto;
 import com.team9.answer_service.remote.ai.dto.FeedbackScoreResponseDto;
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.team9.answer_service.domain.CSAnswer;
@@ -38,11 +38,11 @@ public class CSAnswerService {
 
     // 답변 작성
     public CSAnswerResponse.CSAnswerDetailResponse createAnswer(CSAnswerRequest.CSAnswerCreateRequest request,
-                                                                UserDetails userDetails) {
-        Long userId = getUserIdFromDetails(userDetails);
+                                                                Long userId) {
         UserDto.CSAnswerUserDto user = remoteUserService.getUserById(userId);
 
-        CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(request.getCsquestion_id());
+        CustomResponse<CSQuestionDto.Response> response = remoteCSQuestionService.getQuestionById(request.getCsquestion_id());
+        CSQuestionDto.Response question = response.getResult();
         if (question == null) {
             throw new IllegalArgumentException("질문이 존재하지 않습니다.");
         }
@@ -66,14 +66,15 @@ public class CSAnswerService {
     }
 
     // 내 답변 리스트 조회
-    public Page<CSAnswerResponse.CSAnswerListResponse> getMyAnswerList(UserDetails userDetails, Pageable pageable, Long questionId) {
-        Long userId = getUserIdFromDetails(userDetails);
+    public Page<CSAnswerResponse.CSAnswerListResponse> getMyAnswerList(Long userId, Pageable pageable, Long questionId) {
 
         Page<CSAnswer> answers;
         if (questionId == null) {       // questionId가 없으면 모든 question에 대해 내 답변 조회
             answers = csAnswerRepository.findAllByUserId(userId, pageable);
         } else {                        // questionId가 들어오면 특정 질문에 대한 내 답변 리스트 조회
-            CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(questionId);
+            CustomResponse<CSQuestionDto.Response> response = remoteCSQuestionService.getQuestionById(questionId);
+            CSQuestionDto.Response question = response.getResult();
+
             if (question == null) {
                 throw new IllegalArgumentException("질문이 존재하지 않습니다.");
             }
@@ -81,7 +82,8 @@ public class CSAnswerService {
         }
 
         return answers.map(answer -> {
-            CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(answer.getCsQuestionId());
+            CustomResponse<CSQuestionDto.Response> response = remoteCSQuestionService.getQuestionById(answer.getCsQuestionId());
+            CSQuestionDto.Response question = response.getResult();
             UserDto.CSAnswerUserDto user = remoteUserService.getUserById(userId);
 
             return buildAnswerListResponse(answer, user.getNickname(), question, true);
@@ -89,13 +91,13 @@ public class CSAnswerService {
     }
 
     // 특정 질문의 전체 답변 리스트 조회
-    public Page<CSAnswerResponse.CSAnswerListResponse> getAnswerList(UserDetails userDetails, Pageable pageable, Long questionId) {
-        Long userId = getUserIdFromDetails(userDetails);
+    public Page<CSAnswerResponse.CSAnswerListResponse> getAnswerList(Long userId, Pageable pageable, Long questionId) {
 
         Page<CSAnswer> answers;
         answers = csAnswerRepository.findAllByCsQuestionId(questionId, pageable);
 
-        CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(questionId);
+        CustomResponse<CSQuestionDto.Response> response = remoteCSQuestionService.getQuestionById(questionId);
+        CSQuestionDto.Response question = response.getResult();
 
         // 이미 푼 문제인지 검사
         boolean canAccess = csAnswerRepository.existsByUserIdAndCsQuestionId(userId, questionId);
@@ -107,14 +109,15 @@ public class CSAnswerService {
     }
 
     // 특정 답변 조회
-    public CSAnswerResponse.CSAnswerDetailResponse getAnswerDetail(Long answerId, UserDetails userDetails) {
-        Long userId = getUserIdFromDetails(userDetails);
+    public CSAnswerResponse.CSAnswerDetailResponse getAnswerDetail(Long answerId, Long userId) {
 
         CSAnswer answer = csAnswerRepository.findById(answerId) // 400
                 .orElseThrow(() -> new IllegalArgumentException("답변이 존재하지 않습니다."));
 
         Long questionId = answer.getCsQuestionId();
-        CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(questionId);
+
+        CustomResponse<CSQuestionDto.Response> response = remoteCSQuestionService.getQuestionById(questionId);
+        CSQuestionDto.Response question = response.getResult();
 
         // 이미 푼 문제인지 검사
         boolean canAccess = csAnswerRepository.existsByUserIdAndCsQuestionId(userId, answer.getCsQuestionId());
@@ -130,16 +133,16 @@ public class CSAnswerService {
 
     // 답변 수정
     public CSAnswerResponse.CSAnswerDetailResponse updateAnswer(Long answerId, CSAnswerRequest.CSAnswerUpdate request,
-                                                                UserDetails userDetails) {
+                                                                Long userId) {
 
-        Long userId = getUserIdFromDetails(userDetails);
         UserDto.CSAnswerUserDto user = remoteUserService.getUserById(userId);
 
         CSAnswer answer = csAnswerRepository.findById(answerId) // 400
                 .orElseThrow(() -> new IllegalArgumentException("답변이 존재하지 않습니다."));
 
         Long questionId = answer.getCsQuestionId();
-        CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(questionId);
+        CustomResponse<CSQuestionDto.Response> response = remoteCSQuestionService.getQuestionById(questionId);
+        CSQuestionDto.Response question = response.getResult();
 
         if (!answer.getUserId().equals(userId)) { // 500
             throw new RuntimeException("자신의 답변만 수정할 수 있습니다.");
@@ -153,8 +156,7 @@ public class CSAnswerService {
     }
 
     // 답변 삭제
-    public void deleteAnswer(Long answerId, UserDetails userDetails) {
-        Long userId = getUserIdFromDetails(userDetails);
+    public void deleteAnswer(Long answerId, Long userId) {
         UserDto.CSAnswerUserDto user = remoteUserService.getUserById(userId);
 
         CSAnswer answer = csAnswerRepository.findById(answerId) // 400
@@ -167,9 +169,8 @@ public class CSAnswerService {
     }
 
     // 푼 문제 개수
-    public Long countSolvedQuestion(String categoryName, UserDetails userDetails) {
+    public Long countSolvedQuestion(String categoryName, Long userId) {
 
-        Long userId = getUserIdFromDetails(userDetails);
         List<CSAnswer> answers = csAnswerRepository.findAllByUserId(userId);
 
         Set<Long> distinctQuestionIds = answers.stream().map(CSAnswer::getCsQuestionId).collect(Collectors.toSet());
@@ -180,7 +181,8 @@ public class CSAnswerService {
 
         Long count = distinctQuestionIds.stream().filter(questionId -> {
                     try {
-                        CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(questionId);
+                        CustomResponse<CSQuestionDto.Response> response = remoteCSQuestionService.getQuestionById(questionId);
+                        CSQuestionDto.Response question = response.getResult();
                         return categoryName.equals(question.getCategory().name());
                     } catch (Exception e) {
                         return false;
@@ -200,14 +202,14 @@ public class CSAnswerService {
 
     // 통계를 위한 내 답변들 받아오기
     // 평균점수, 카테고리별 평균점수, 카테고리별 푼 문제 수 통계 서비스에서 구할 수 있게 데이터 전달
-    public List<CSAnswerResponse.CSStatisticResponse> getStatisticAnswers(UserDetails userDetails, String categoryName) {
-        Long userId = getUserIdFromDetails(userDetails);
+    public List<CSAnswerResponse.CSStatisticResponse> getStatisticAnswers(Long userId, String categoryName) {
 
         List<CSAnswer> answers = csAnswerRepository.findAllByUserId(userId);
 
         List<CSAnswerResponse.CSStatisticResponse> statisticAnswers = answers.stream().map((answer) ->
                 {
-                    CSQuestionDto.Response question = remoteCSQuestionService.getQuestionById(answer.getCsQuestionId());
+                    CustomResponse<CSQuestionDto.Response> response = remoteCSQuestionService.getQuestionById(answer.getCsQuestionId());
+                    CSQuestionDto.Response question = response.getResult();
 
                     return CSAnswerResponse.CSStatisticResponse.builder()
                             .csanswer_id(answer.getId())
@@ -226,14 +228,6 @@ public class CSAnswerService {
         csAnswerRepository.deleteAllByUserId(userId);
     }
 
-    private Long getUserIdFromDetails(UserDetails userDetails) {
-        // TODO: remoteUserService에서 findByEmail
-        Long id = remoteUserService.getUserIdByEmail(userDetails.getUsername());
-        if (id == null) {
-            throw new RuntimeException("사용자 정보를 찾을 수 없습니다.");
-        }
-        return id;
-    }
 
     private CSAnswerResponse.CSAnswerDetailResponse buildAnswerDetailResponse(CSAnswer answer, UserDto.CSAnswerUserDto user, CSQuestionDto.Response question) {
         return CSAnswerResponse.CSAnswerDetailResponse.builder()

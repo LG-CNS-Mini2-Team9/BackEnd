@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,16 +46,16 @@ public class InternalAnswerController {
         return ResponseEntity.ok(CustomResponse.ok(questionIds));
     }
 
-    @GetMapping("/count")
-    public Long countSolvedQuestion(@RequestParam(required=false) String categoryName, @AuthenticationPrincipal UserDetails userDetails){
-        return csAnswerService.countSolvedQuestion(categoryName, userDetails);
+    @GetMapping("/count/{userId}")
+    public Long countSolvedQuestion(@RequestParam(required=false) String categoryName, @PathVariable Long userId){
+        return csAnswerService.countSolvedQuestion(categoryName, userId);
     }
 
     // 통계를 위한 내 답변들 받아오기
     // 평균점수, 카테고리별 평균점수, 카테고리별 푼 문제 수 통계 서비스에서 구할 수 있게 데이터 전달
-    @GetMapping("/statistic")
-    public List<CSAnswerResponse.CSStatisticResponse> getMyAnswers(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) String categoryName){
-        return csAnswerService.getStatisticAnswers(userDetails, categoryName);
+    @GetMapping("/statistic/{userId}")
+    public List<CSAnswerResponse.CSStatisticResponse> getMyAnswers(@PathVariable Long userId, @RequestParam(required = false) String categoryName){
+        return csAnswerService.getStatisticAnswers(userId, categoryName);
     }
 
     @PostMapping("/user/{userId}")
