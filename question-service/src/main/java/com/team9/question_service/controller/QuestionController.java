@@ -1,6 +1,6 @@
 package com.team9.question_service.controller;
 
-import com.team9.common.response.CustomResponse;
+import com.team9.question_service.global.response.CustomResponse;
 import com.team9.question_service.dto.QuestionResponse;
 import com.team9.question_service.service.QuestionService;
 import lombok.RequiredArgsConstructor;

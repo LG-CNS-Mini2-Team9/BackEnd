@@ -1,6 +1,6 @@
 package com.team9.question_service.remote;
 
-import com.team9.common.response.CustomResponse; // common 모듈의 응답 객체
+import com.team9.question_service.global.response.CustomResponse; // common 모듈의 응답 객체
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

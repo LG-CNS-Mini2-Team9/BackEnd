@@ -1,9 +1,9 @@
 package com.team9.question_service.service;
 
-import com.team9.common.domain.Category;
 import com.team9.question_service.domain.Question;
 import com.team9.question_service.dto.AiCreatedQuestionDto;
 import com.team9.question_service.dto.AiGenerationRequestDto;
+import com.team9.question_service.global.domain.Category;
 import com.team9.question_service.repository.QuestionRepository;
 import com.team9.question_service.remote.AIFeedbackServiceClient;
 import lombok.RequiredArgsConstructor;
