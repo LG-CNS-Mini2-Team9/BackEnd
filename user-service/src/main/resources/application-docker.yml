@@ -13,3 +13,15 @@ eureka:
   instance:
     prefer-ip-address: true
     ip-address: ${EUREKA_INSTANCE_IP_ADDRESS}
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: ${AWS_S3_BUCKET}

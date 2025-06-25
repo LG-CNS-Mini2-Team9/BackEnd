@@ -1,11 +1,12 @@
 package com.team9.question_service.service;
 
-import com.team9.common.code.GeneralErrorCode;
-import com.team9.common.domain.Category;
-import com.team9.common.exception.CustomException;
-import com.team9.common.response.CustomResponse;
+import com.team9.question_service.global.code.GeneralErrorCode;
+import com.team9.question_service.global.domain.Category;
+import com.team9.question_service.global.exception.CustomException;
+import com.team9.question_service.global.response.CustomResponse;
 import com.team9.question_service.domain.Question;
 import com.team9.question_service.dto.QuestionResponse;
+import com.team9.question_service.dto.UserProfileResponseDto;
 import com.team9.question_service.repository.QuestionRepository;
 import com.team9.question_service.remote.AnswerServiceClient;
 import com.team9.question_service.remote.UserServiceClient; // UserServiceClient 임포트
@@ -143,21 +144,28 @@ public class QuestionService {
     // user-service 호출 및 예외 처리 로직
     private List<String> getUserInterests(Long userId) {
         try {
-            ResponseEntity<CustomResponse<List<String>>> responseEntity = userServiceClient.getUserInterests(userId);
+            // 1. 변경된 Feign Client 메서드를 호출합니다.
+            ResponseEntity<CustomResponse<UserProfileResponseDto>> responseEntity = userServiceClient.getUserProfile(userId);
+
+            // 2. 응답이 성공적인지, body가 null이 아닌지, isSuccess가 true인지 확인합니다.
             if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null && responseEntity.getBody().isSuccess()) {
-                List<String> interests = responseEntity.getBody().getResult();
-                if (interests != null) {
+                UserProfileResponseDto userProfile = responseEntity.getBody().getResult();
+
+                // 3. 응답 DTO에서 관심사 목록을 추출합니다.
+                if (userProfile != null && userProfile.getInterestCategories() != null) {
+                    List<String> interests = userProfile.getInterestCategories();
                     log.info("user-service로부터 userId: {}의 관심 카테고리 {}개를 받았습니다.", userId, interests.size());
                     return interests;
                 }
             } else {
-                log.warn("user-service로부터 관심 카테고리 목록을 가져오는 데 실패했습니다. status: {}, body: {}",
+                log.warn("user-service로부터 사용자 프로필을 가져오는 데 실패했습니다. status: {}, body: {}",
                         responseEntity.getStatusCode(), responseEntity.getBody());
             }
         } catch (Exception e) {
             log.error("user-service 호출 중 에러 발생: userId={}", userId, e);
         }
-        return Collections.emptyList(); // 실패 시 빈 리스트 반환하여 NullPointerException 방지
+        // 실패 시 빈 리스트를 반환하여 NullPointerException을 방지합니다.
+        return Collections.emptyList();
     }
 
     private Set<Long> getSubmittedQuestionIds(Long userId) {
