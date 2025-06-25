@@ -18,7 +18,7 @@ public class CSAnswerResponse {
         private String csquestion_content;
         private Long csanswer_id;
         private String csanswer_content;
-        private Long csanswer_score;
+        private int csanswer_score;
         private LocalDateTime csanswer_created_at;
         private boolean canAccess;
     }
@@ -33,7 +33,7 @@ public class CSAnswerResponse {
         private String csquestion_content;
         private Long csanswer_id;
         private String csanswer_content;
-        private Long csanswer_score;
+        private int csanswer_score;
         private LocalDateTime csanswer_created_at;
     }
 
@@ -44,7 +44,7 @@ public class CSAnswerResponse {
         private Long csquestion_id;
         private Category csquestion_category;
         private Long csanswer_id;
-        private Long csanswer_score;
+        private int csanswer_score;
     }
 
 //    @Data
