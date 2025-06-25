@@ -1,19 +1,16 @@
 package com.team9.user_service.service;
 
-//import com.lgcns.backend.csanswer.repository.CSAnswerRepository;
-
 import com.team9.user_service.domain.User;
 import com.team9.user_service.dto.request.SignUpRequestDto;
 import com.team9.user_service.dto.request.UpdateUserRequestDto;
 import com.team9.user_service.global.code.GeneralErrorCode;
 import com.team9.user_service.global.response.CustomResponse;
+import com.team9.user_service.remote.answer.RemoteAnswerService;
 import com.team9.user_service.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,8 +31,9 @@ public class UserService {
     AuthenticationManager authManager;
     @Autowired
     private S3Service s3Service;
-//    @Autowired
-//    private CSAnswerRepository csAnswerRepository;
+    @Autowired
+    private RemoteAnswerService remoteAnswerService;
+
 
     // 회원가입 기능
     public void signUp(SignUpRequestDto dto, String imageurl) {
@@ -85,8 +83,8 @@ public class UserService {
         try {
             logger.info("사용자 삭제 시작: " + user.getEmail());
 
-//            csAnswerRepository.deleteByUser(user);
-//            logger.info("CSAnswer 삭제 완료: " + user.getEmail());
+            // 답변 삭제 요청
+            remoteAnswerService.deleteAnswersByUser(user.getEmail());
 
             // 사용자 삭제
             userRepository.delete(user);
