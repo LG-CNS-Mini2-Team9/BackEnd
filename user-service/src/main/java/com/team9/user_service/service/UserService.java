@@ -2,46 +2,34 @@ package com.team9.user_service.service;
 
 //import com.lgcns.backend.csanswer.repository.CSAnswerRepository;
 
-
 import com.team9.user_service.domain.User;
-import com.team9.user_service.dto.request.LoginRequestDto;
 import com.team9.user_service.dto.request.SignUpRequestDto;
 import com.team9.user_service.dto.request.UpdateUserRequestDto;
 import com.team9.user_service.global.code.GeneralErrorCode;
-import com.team9.user_service.global.code.GeneralSuccessCode;
 import com.team9.user_service.global.response.CustomResponse;
 import com.team9.user_service.repository.UserRepository;
-import com.team9.user_service.security.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-
-
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class UserService {
 
-    // user레파지, PasswordEncoder, jwt유틸 와이어링
+    // user레파지, PasswordEncoder
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    JwtUtil jwtUtil;
     @Autowired
     AuthenticationManager authManager;
     @Autowired
@@ -72,39 +60,21 @@ public class UserService {
 
     }
 
-    // 로그인 기능
-    public CustomResponse login(LoginRequestDto dto) {
+    // 로그인
+    public boolean validateCredentials(String email, String password) {
         try {
-            // 이메일을 username으로 취급함
-            Authentication authentication = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            dto.getEmail(), dto.getPassword()));
-
-            // 인증 성공시 JWT 발행
-            String accessToken = jwtUtil.createAccessToken(authentication.getName());
-            String refreshToken = jwtUtil.createRefreshToken(authentication.getName()); // 리프레시 토큰 발급 추가
-            System.out.println("✅ 인증 성공: " + authentication.getName());
-
-
-            User user = userRepository.findByEmail(dto.getEmail())
-                    .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
-
-            String profileImgUrl = user.getProfileImage();
-            Map<String, String> map = new HashMap<>();
-
-            map.put("accesstoken", accessToken);
-            map.put("refreshtoken", refreshToken);
-            map.put("email", user.getEmail());
-            map.put("name", user.getName());
-            map.put("nickname", user.getNickname());
-            map.put("profileImgUrl", profileImgUrl);
-
-            return CustomResponse.success(GeneralSuccessCode._OK, map);
-
+            authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+            return true;
         } catch (AuthenticationException e) {
-            System.out.println("❌ 인증 실패: " + e.getMessage());
-            return CustomResponse.fail(GeneralErrorCode._UNAUTHORIZED, "로그인 실패: 잘못된 이메일 또는 비밀번호");
+            return false;
         }
+    }
+
+    // 리프레시
+    public boolean existsById(String userId) {
+        return userRepository.existsByEmail(userId);
     }
 
     // 회원 탈퇴 기능
@@ -185,9 +155,4 @@ public class UserService {
         return CustomResponse.ok("회원 정보 수정 완료");
 
     }
-
-    public boolean existsById(String userId) {
-        return userRepository.existsByEmail(userId);
-    }
-
 }

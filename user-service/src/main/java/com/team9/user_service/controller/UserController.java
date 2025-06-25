@@ -1,35 +1,31 @@
 package com.team9.user_service.controller;
 
+import com.team9.common.dto.ApiResponseDto;
 import com.team9.user_service.dto.request.LoginRequestDto;
 import com.team9.user_service.dto.request.SignUpRequestDto;
 import com.team9.user_service.dto.request.UpdateUserRequestDto;
 import com.team9.user_service.global.code.GeneralErrorCode;
 import com.team9.user_service.global.code.GeneralSuccessCode;
 import com.team9.user_service.global.response.CustomResponse;
-import com.team9.user_service.security.util.JwtUtil;
 import com.team9.user_service.service.S3Service;
 import com.team9.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 public class UserController {
 
     @Autowired
     UserService userService;
-    @Autowired
-    JwtUtil jwtUtil;
     @Autowired
     AuthenticationManager authManager;
     @Autowired
@@ -57,20 +53,29 @@ public class UserController {
         }
     }
 
-    @PostMapping("/user/login")
-    public ResponseEntity<CustomResponse<String>> login(@RequestBody LoginRequestDto dto) {
-        CustomResponse<String> response = userService.login(dto);
-        
-        // 리턴이 실패인 경우
-        if (!response.isSuccess()) {
-            return ResponseEntity.status(GeneralErrorCode._UNAUTHORIZED.getHttpStatus())
-                    .body(response);
+    // 로그인 (api-gateway)
+    @PostMapping("/backend/user/v1/validate")
+    public ApiResponseDto<String> validate(@RequestBody LoginRequestDto dto) {
+        boolean isValid = userService.validateCredentials(dto.getEmail(), dto.getPassword());
+
+        if (isValid) {
+            return ApiResponseDto.defaultOk();
+        } else {
+            return ApiResponseDto.createError("UNAUTHORIZED", "아이디 또는 비밀번호가 틀렸습니다.");
         }
-        
-        // 성공인 경우
-        return ResponseEntity.ok(response);
     }
 
+    // 리프레시 (api-gateway)
+    @GetMapping("/backend/user/v1/user/{userId}")
+    public ApiResponseDto<String> exists(@PathVariable String userId) {
+        if (userService.existsById(userId)) {
+            return ApiResponseDto.defaultOk();
+        } else {
+            return ApiResponseDto.createError("NOT_FOUND", "사용자를 찾을 수 없습니다.");
+        }
+    }
+
+    // 회원 탈퇴
     @PostMapping("/user/delete")
     public ResponseEntity<CustomResponse<String>> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
 
@@ -81,6 +86,7 @@ public class UserController {
                 .body(CustomResponse.success(GeneralSuccessCode._OK, "회원 탈퇴 완료"));
     }
 
+    // 회원정보 수정
     @PostMapping("/user/update")
     public ResponseEntity<CustomResponse<String>> updateUser(@AuthenticationPrincipal UserDetails userDetails,
                            @ModelAttribute UpdateUserRequestDto dto) throws IOException {
@@ -99,39 +105,4 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping("/user/logout")
-    public ResponseEntity<CustomResponse<String>> logout(@AuthenticationPrincipal UserDetails userDetails) {
-        String username = userDetails.getUsername(); // 사용자 이메일 토큰으로 추출
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(CustomResponse.ok("로그아웃 완료"));
-    }
-
-    // 유저 존재 여부 확인
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<CustomResponse<String>> exists(@PathVariable String userId) {
-        boolean exists = userService.existsById(userId);  // 이 함수는 아래에서 추가
-        if (exists) {
-            return ResponseEntity.ok(CustomResponse.ok("존재하는 사용자입니다."));
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(CustomResponse.fail(GeneralErrorCode._NOT_FOUND, "사용자를 찾을 수 없습니다."));
-        }
-    }
-
-    // 로그인 인증 검증 (비밀번호 검증)
-    @PostMapping("/validate")
-    public ResponseEntity<CustomResponse<String>> validate(@RequestBody LoginRequestDto dto) {
-        try {
-            Authentication authentication = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
-            );
-            return ResponseEntity.ok(CustomResponse.ok("사용자 인증 성공"));
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(CustomResponse.fail(GeneralErrorCode._UNAUTHORIZED, "인증 실패: 잘못된 정보입니다."));
-        }
-    }
-
 }
