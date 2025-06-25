@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "backend-user", path = "/backend/user/v1")
 public interface RemoteUserService {
-    @GetMapping("/user/{userId}")
+    @GetMapping("/exists/{userId}")
     public ApiResponseDto<String> exists(@PathVariable String userId);
 
     @PostMapping("/validate")
