@@ -24,7 +24,6 @@ public class S3Service {
 
     // 이미지 파일 업로드 메소드
     public String upload(MultipartFile file) throws IOException {
-
         String fileName = getFileName(file);
 
         ObjectMetadata metadata = new ObjectMetadata();

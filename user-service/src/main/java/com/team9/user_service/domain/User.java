@@ -11,6 +11,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +29,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String nickname;
 
-    // @Column(nullable = false)
+    @Column(length = 1000)
     private String profileImage;
 
     private String provider;

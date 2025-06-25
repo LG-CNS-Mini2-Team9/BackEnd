@@ -2,9 +2,8 @@ package com.team9.user_service.service;
 
 import com.team9.user_service.domain.User;
 import com.team9.user_service.dto.request.SignUpRequestDto;
-import com.team9.user_service.dto.request.UpdateUserRequestDto;
-import com.team9.user_service.global.code.GeneralErrorCode;
-import com.team9.user_service.global.response.CustomResponse;
+import com.team9.user_service.dto.request.UpdateUserProfileRequestDto;
+import com.team9.user_service.dto.response.UserProfileResponseDto;
 import com.team9.user_service.remote.answer.RemoteAnswerService;
 import com.team9.user_service.repository.UserRepository;
 import org.slf4j.Logger;
@@ -16,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -62,7 +60,7 @@ public class UserService {
     public boolean validateCredentials(String email, String password) {
         Optional<User> user = userRepository.findByEmail(email);
 
-        return user.map(value -> value.getPassword().equals(password)).orElse(false);
+        return user.map(value -> passwordEncoder.matches(password, value.getPassword())).orElse(false);
     }
 
     // 리프레시
@@ -97,55 +95,85 @@ public class UserService {
         }
     }
 
-    // 회원 정보 변경 기능
-    public CustomResponse updateUser(String email, UpdateUserRequestDto dto) throws IOException {
-        // 사용자 존재여부 판단 - 굳이 필요 없긴하다
+    // 프로필 조회
+    public UserProfileResponseDto getUserProfile(String email) {
+
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
 
+        return UserProfileResponseDto.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .profileImage(user.getProfileImage())
+                .interests(user.getInterests())
+                .build();
+    }
 
-        // 1. 닉네임은 기존과 다른지 + 중복 검사까지 수행
-        // 변경 정보의 닉네임이 null이 아니면
-        if (dto.getNickname() != null) {
-            if (!user.getNickname().equals(dto.getNickname())) { // 기존 닉네임과 수정하려는 닉네임과 다르다면
-                if (userRepository.existsByNickname(dto.getNickname())) { // 만일 닉네임이 이미 존재시
-                    return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "이미 사용 중인 닉네임입니다.");
-                }
-                else {
-                    user.setNickname(dto.getNickname());
-                }
-            } else { // 같다면
-                return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "기존 닉네임과 같습니다.");
-            }
-        } else {
-            return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "모든 정보를 입력해주세요.");
-        }
+    // 프로필 수정
+    @Transactional
+    public void updateUserProfile(String email, UpdateUserProfileRequestDto dto) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
 
-        // 2. 비밀번호 변경 로직 - 기존 것이 일치하는지 -> 일치하면 새 비밀번호로 변경
-        if (dto.getCurrentPassword() != null && dto.getNewPassword() != null) { // 만일 기존 비밀번호와 새 비밀번호가 존재시
-            // 기존 비밀번호가 일치하는지 확인
-            if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
-                return CustomResponse.fail(GeneralErrorCode._UNAUTHORIZED, "기존 비밀번호가 일치하지 않습니다.");
-            }
-
-            // 새 비밀번호가 기존 비밀번호와 같은지 확인
-            if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
-                return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "기존 비밀번호와 동일한 비밀번호로는 변경할 수 없습니다.");
-            }
-            // 변경 진행
-            user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-        } else {
-            return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "모든 정보를 입력해주세요222.");
-        }
-
-        // 프로필 이미지
-        if (dto.getNewProfileimage() != null) {
-            String imageUrl = s3Service.upload(dto.getNewProfileimage());
-            user.setProfileImage(imageUrl);
-        }
+        if (dto.getName() != null) user.setName(dto.getName());
+        if (dto.getNickname() != null) user.setNickname(dto.getNickname());
+        if (dto.getProfileImage() != null) user.setProfileImage(dto.getProfileImage());
+        if (dto.getInterests() != null) user.setInterests(dto.getInterests());
 
         userRepository.save(user);
-        return CustomResponse.ok("회원 정보 수정 완료");
-
     }
+
+
+    // 회원 정보 변경 기능
+//    public CustomResponse updateUser(String email, UpdateUserRequestDto dto) throws IOException {
+//        // 사용자 존재여부 판단 - 굳이 필요 없긴하다
+//        User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+//
+//
+//        // 1. 닉네임은 기존과 다른지 + 중복 검사까지 수행
+//        // 변경 정보의 닉네임이 null이 아니면
+//        if (dto.getNickname() != null) {
+//            if (!user.getNickname().equals(dto.getNickname())) { // 기존 닉네임과 수정하려는 닉네임과 다르다면
+//                if (userRepository.existsByNickname(dto.getNickname())) { // 만일 닉네임이 이미 존재시
+//                    return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "이미 사용 중인 닉네임입니다.");
+//                }
+//                else {
+//                    user.setNickname(dto.getNickname());
+//                }
+//            } else { // 같다면
+//                return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "기존 닉네임과 같습니다.");
+//            }
+//        } else {
+//            return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "모든 정보를 입력해주세요.");
+//        }
+//
+//        // 2. 비밀번호 변경 로직 - 기존 것이 일치하는지 -> 일치하면 새 비밀번호로 변경
+//        if (dto.getCurrentPassword() != null && dto.getNewPassword() != null) { // 만일 기존 비밀번호와 새 비밀번호가 존재시
+//            // 기존 비밀번호가 일치하는지 확인
+//            if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+//                return CustomResponse.fail(GeneralErrorCode._UNAUTHORIZED, "기존 비밀번호가 일치하지 않습니다.");
+//            }
+//
+//            // 새 비밀번호가 기존 비밀번호와 같은지 확인
+//            if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
+//                return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "기존 비밀번호와 동일한 비밀번호로는 변경할 수 없습니다.");
+//            }
+//            // 변경 진행
+//            user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+//        } else {
+//            return CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "모든 정보를 입력해주세요222.");
+//        }
+//
+//        // 프로필 이미지
+//        if (dto.getNewProfileimage() != null) {
+//            String imageUrl = s3Service.upload(dto.getNewProfileimage());
+//            user.setProfileImage(imageUrl);
+//        }
+//
+//        userRepository.save(user);
+//        return CustomResponse.ok("회원 정보 수정 완료");
+//
+//    }
 }
