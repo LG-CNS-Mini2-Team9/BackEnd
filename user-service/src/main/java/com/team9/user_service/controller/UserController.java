@@ -4,8 +4,6 @@ import com.team9.common.dto.ApiResponseDto;
 import com.team9.user_service.domain.User;
 import com.team9.user_service.dto.request.LoginRequestDto;
 import com.team9.user_service.dto.request.SignUpRequestDto;
-import com.team9.user_service.dto.request.UpdateUserRequestDto;
-import com.team9.user_service.dto.response.UserAnswerDto;
 import com.team9.user_service.dto.request.UpdateUserProfileRequestDto;
 import com.team9.user_service.dto.response.UserProfileResponseDto;
 import com.team9.user_service.global.code.GeneralErrorCode;
