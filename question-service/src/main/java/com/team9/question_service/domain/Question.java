@@ -1,15 +1,12 @@
 package com.team9.question_service.domain;
 
-import com.team9.common.domain.Category;
+import com.team9.question_service.global.domain.Category;
 import jakarta.persistence.*;
 import lombok.*;
-// import org.hibernate.annotations.JdbcTypeCode; // JSON 타입 사용하지 않으므로 주석 처리
-// import org.hibernate.type.SqlTypes; // JSON 타입 사용하지 않으므로 주석 처리
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-// import java.util.Map; // Map<String, Object> 대신 String을 사용하므로 필요 없음
 
 @Entity
 @Getter

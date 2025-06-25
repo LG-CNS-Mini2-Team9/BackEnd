@@ -1,9 +1,9 @@
 package com.team9.question_service.service;
 
-import com.team9.common.code.GeneralErrorCode;
-import com.team9.common.domain.Category;
-import com.team9.common.exception.CustomException;
-import com.team9.common.response.CustomResponse;
+import com.team9.question_service.global.code.GeneralErrorCode;
+import com.team9.question_service.global.domain.Category;
+import com.team9.question_service.global.exception.CustomException;
+import com.team9.question_service.global.response.CustomResponse;
 import com.team9.question_service.domain.Question;
 import com.team9.question_service.dto.QuestionResponse;
 import com.team9.question_service.dto.UserProfileResponseDto;

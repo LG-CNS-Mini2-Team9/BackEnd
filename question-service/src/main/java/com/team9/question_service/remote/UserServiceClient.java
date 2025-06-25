@@ -1,6 +1,6 @@
 package com.team9.question_service.remote;
 
-import com.team9.common.response.CustomResponse;
+import com.team9.question_service.global.response.CustomResponse;
 import com.team9.question_service.dto.UserProfileResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package com.team9.question_service.remote;
 
-import com.team9.common.response.CustomResponse; // common 모듈의 CustomResponse 사용 (만약 없다면 새로 정의 필요)
+import com.team9.question_service.global.response.CustomResponse; // common 모듈의 CustomResponse 사용 (만약 없다면 새로 정의 필요)
 import com.team9.question_service.dto.AiCreatedQuestionDto;
 import com.team9.question_service.dto.AiGenerationRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
