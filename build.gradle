@@ -11,6 +11,7 @@ ext {
 allprojects {
     group = 'com.team9'
     version = '1.0.0'
+
     repositories {
         mavenCentral()
     }
@@ -26,11 +27,34 @@ subprojects {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
     }
+}
 
-    // common이 아닌 모든 서비스에 common 의존성 추가
-    if (project.name != 'common') {
-        dependencies {
-            implementation project(':common')
-        }
+project(':ai-feedback-service') {
+    dependencies {
+        implementation project(':common')
+    }
+}
+
+project(':answer-service') {
+    dependencies {
+        implementation project(':common')
+    }
+}
+
+project(':question-service') {
+    dependencies {
+        implementation project(':common')
+    }
+}
+
+project(':statistic-service') {
+    dependencies {
+        implementation project(':common')
+    }
+}
+
+project(':user-service') {
+    dependencies {
+        implementation project(':common')
     }
 }
