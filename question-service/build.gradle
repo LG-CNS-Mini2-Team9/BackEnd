@@ -41,8 +41,7 @@ dependencies {
 	// 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-	// 'common' 모듈 의존성은 루트 build.gradle에서 자동으로 추가해 주므로 여기서는 생략합니다.
+	runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
 tasks.named('test') {

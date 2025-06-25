@@ -1,7 +1,9 @@
 package com.team9.answer_service.api.open;
 
+import com.team9.answer_service.domain.CSAnswer;
 import com.team9.answer_service.domain.dto.CSAnswerRequest;
 import com.team9.answer_service.domain.dto.CSAnswerResponse;
+import com.team9.answer_service.domain.repository.CSAnswerRepository;
 import com.team9.answer_service.global.code.GeneralSuccessCode;
 import com.team9.answer_service.global.response.CustomResponse;
 import com.team9.answer_service.service.CSAnswerService;
@@ -27,12 +29,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/answers/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class CSAnswerController {
     private final CSAnswerService csAnswerService;
+    private final CSAnswerRepository csAnswerRepository;
 
     // 답변 작성
     @PostMapping
@@ -77,7 +82,7 @@ public class CSAnswerController {
     }
 
     // 특정 답변 조회 (페이지, 특정 질문)
-    @GetMapping("/{answerId}")
+    @GetMapping("/detail/{answerId}")
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> readAnswer(
             @PathVariable Long answerId,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -104,6 +109,10 @@ public class CSAnswerController {
                 .body(CustomResponse.success(GeneralSuccessCode._DELETED, null));
     }
 
+    @GetMapping("/test")
+    public List<CSAnswer> test(){
+        return csAnswerRepository.findAll();
+    }
 }
 
 
