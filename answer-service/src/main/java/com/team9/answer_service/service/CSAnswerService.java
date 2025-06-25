@@ -6,6 +6,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.team9.answer_service.global.domain.Category;
+import com.team9.answer_service.remote.ai.RemoteAIFeedbackService;
+import com.team9.answer_service.remote.ai.dto.FeedbackRequestDto;
+import com.team9.answer_service.remote.ai.dto.FeedbackScoreResponseDto;
 import com.team9.answer_service.remote.csquestion.dto.CSQuestionDto;
 import com.team9.answer_service.remote.csquestion.RemoteCSQuestionService;
 import com.team9.answer_service.remote.user.RemoteUserService;
@@ -30,6 +33,7 @@ public class CSAnswerService {
     private final CSAnswerRepository csAnswerRepository;
     private final RemoteCSQuestionService remoteCSQuestionService;
     private final RemoteUserService remoteUserService;
+    private final RemoteAIFeedbackService remoteAIFeedbackService;
 
 
     // 답변 작성
@@ -43,14 +47,21 @@ public class CSAnswerService {
             throw new IllegalArgumentException("질문이 존재하지 않습니다.");
         }
 
+        // 답변 저장
         CSAnswer answer = new CSAnswer();
         answer.setContent(request.getCsanswer_content());
         answer.setCreatedAt(LocalDateTime.now());
-        answer.setScore(0L);
+        answer.setScore(0);
         answer.setCsQuestionId(request.getCsquestion_id());
         answer.setUserId(userId);
-
         csAnswerRepository.save(answer);
+
+        // 피드백 생성
+        FeedbackScoreResponseDto feedback = createFeedback(request.getCsquestion_id(), answer.getId(), answer.getContent());
+        // 점수 저장
+        answer.setScore(feedback.getScore());
+        csAnswerRepository.save(answer);
+
         return buildAnswerDetailResponse(answer, user, question);
     }
 
@@ -135,7 +146,7 @@ public class CSAnswerService {
         }
 
         answer.setContent(request.getCsanswer_content());
-        answer.setScore(0L);
+        answer.setScore(0);
         csAnswerRepository.save(answer);
 
         return buildAnswerDetailResponse(answer, user, question);
@@ -176,11 +187,16 @@ public class CSAnswerService {
                     }
                 })
                 .count();
-
-
         return count;
-
     }
+
+
+    // 피드백 생성
+    public FeedbackScoreResponseDto createFeedback(Long questionId, Long answerId, String content) {
+        FeedbackRequestDto request = new FeedbackRequestDto(questionId, answerId, content);
+        return remoteAIFeedbackService.createFeedback(request);
+    }
+
 
     // 통계를 위한 내 답변들 받아오기
     // 평균점수, 카테고리별 평균점수, 카테고리별 푼 문제 수 통계 서비스에서 구할 수 있게 데이터 전달
@@ -204,6 +220,10 @@ public class CSAnswerService {
                 .toList();
 
         return statisticAnswers;
+    }
+
+    public void deleteAllByUserId(Long userId) {
+        csAnswerRepository.deleteAllByUserId(userId);
     }
 
     private Long getUserIdFromDetails(UserDetails userDetails) {

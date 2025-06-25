@@ -1,9 +1,11 @@
 package com.team9.question_service.remote;
 
 import com.team9.question_service.global.response.CustomResponse;
+import com.team9.question_service.dto.UserProfileResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -21,6 +23,6 @@ public interface UserServiceClient {
      * @param userId 조회할 사용자의 ID
      * @return CustomResponse 형태의 응답. 결과 데이터는 String 타입의 카테고리 이름 리스트입니다.
      */
-    @GetMapping("/internal/users/interests")
-    ResponseEntity<CustomResponse<List<String>>> getUserInterests(@RequestParam("userId") Long userId);
+    @GetMapping("/api/users/{userId}")
+    ResponseEntity<CustomResponse<UserProfileResponseDto>> getUserProfile(@PathVariable("userId") Long userId); // 2. 메서드명, 파라미터, 반환 타입 변경
 }

@@ -27,7 +27,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/signup").permitAll()
+                        .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/backend/user/v1/**").permitAll()  // validate, exists 등 허용
                         .anyRequest().authenticated()
                 );
