@@ -1,202 +1,208 @@
 package com.team9.statistic_service.service;
 
-import com.team9.statistic_service.domain.entity.TierInfoEntity;
-import com.team9.statistic_service.domain.entity.UserStatisticEntity;
-import com.team9.statistic_service.domain.repository.TierInfoRepository;
-import com.team9.statistic_service.domain.dto.StatisticResponse;
-import lombok.RequiredArgsConstructor;
+import com.team9.statistic_service.domain.enums.Category;
+import com.team9.statistic_service.domain.dto.TierInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
-@Transactional
+@Service
 public class TierService {
 
-    private final TierInfoRepository tierInfoRepository;
+    /**
+     * 티어 조건:
+     * 1단계(뉴비) - 초기값
+     * 2단계(루키) - 답변 수 5개 이상
+     * 3단계(에이스) - 답변 수 15개 이상 + 카테고리별 1개 이상 답변
+     * 4단계(마스터) - 답변 수 40개 이상 + 카테고리별 3개 이상 답변 + 총 답변 평균 점수 70점 이상
+     * 5단계(레전드) - 답변 수 100개 이상 + 카테고리별 5개 이상 답변 + 총 답변 평균 점수 85점 이상
+     */
 
+    public TierInfo calculateTierInfo(long totalAnswerCount, double totalAverageScore, Map<Category, Long> categoryAnswerCounts) {
+        String currentTier = determineTier(totalAnswerCount, totalAverageScore, categoryAnswerCounts);
+        String nextTier = getNextTier(currentTier);
+        double progressPercent = calculateProgress(totalAnswerCount, totalAverageScore, categoryAnswerCounts, currentTier);
+        String progressMessage = createProgressMessage(totalAnswerCount, totalAverageScore, categoryAnswerCounts, currentTier);
 
-//    티어 조건 체크 및 업데이트
-//    티어 승급 조건을 만족하면 티어 업데이트
-    public String checkAndUpdateTier(UserStatisticEntity userStatistic) {
-        List<TierInfoEntity> allTiers = tierInfoRepository.findAllOrderByTierLevel();
-        String newTier = calculateTier(userStatistic, allTiers);
-        if (!newTier.equals(userStatistic.getCurrentTier())) {
-            userStatistic.setCurrentTier(newTier);
-            log.info("User {} tier updated: {} -> {}",
-                    userStatistic.getUserId(), userStatistic.getCurrentTier(), newTier);
-        }
-        return newTier;
-    }
-
-    //사용자 현재 티어 정보 조회
-    @Transactional(readOnly = true)
-    public StatisticResponse.TierResponse getUserTierInfo(Long userId, UserStatisticEntity userStatistic) {
-        TierInfoEntity currentTierInfo = tierInfoRepository.findByTierName(userStatistic.getCurrentTier())
-                .orElseThrow(() -> new RuntimeException("현재 티어 정보를 찾을 수 없습니다."));
-
-        Optional<TierInfoEntity> nextTierInfo = tierInfoRepository.findNextTier(currentTierInfo.getTierLevel());
-
-        return StatisticResponse.TierResponse.builder()
-                .currentTier(currentTierInfo.getTierName())
-                .tierLevel(currentTierInfo.getTierLevel())
-                .progress(calculateTierProgress(userStatistic, currentTierInfo, nextTierInfo.orElse(null)))
-                .nextTier(nextTierInfo.map(this::convertToTierInfoResponse).orElse(null))
+        return TierInfo.builder()
+                .currentTier(currentTier)
+                .nextTier(nextTier)
+                .progressPercent(progressPercent)
+                .progressMessage(progressMessage)
                 .build();
     }
 
-    //모든 티어 정보 조회
-    @Transactional(readOnly = true)
-    public List<StatisticResponse.TierInfoResponse> getAllTierInfo() {
-        return tierInfoRepository.findAllOrderByTierLevel().stream()
-                .map(this::convertToTierInfoResponse)
-                .toList();
-    }
-
-    // Private 메서드들
-
-    //사용자 통계 기반으로 적절한 티어 계산
-    private String calculateTier(UserStatisticEntity userStatistic, List<TierInfoEntity> allTiers) {
-        String currentTier = "뉴비"; // 기본값
-
-        for (TierInfoEntity tier : allTiers) {
-            if (isTierConditionMet(userStatistic, tier)) {
-                currentTier = tier.getTierName();
-            } else {
-                break; // 조건을 만족하지 않으면 더 이상 확인하지 않음
-            }
+    private String determineTier(long totalAnswerCount, double totalAverageScore, Map<Category, Long> categoryAnswerCounts) {
+        // 5단계 (레전드) 체크
+        if (totalAnswerCount >= 100 && totalAverageScore >= 85 && allCategoriesHaveMinAnswers(categoryAnswerCounts, 5)) {
+            return "레전드";
         }
 
-        return currentTier;
-    }
-
-    //티어 승급 조건 만족 여부 체크
-    private boolean isTierConditionMet(UserStatisticEntity userStatistic, TierInfoEntity tier) {
-        // 1. 총 답변 수 조건 체크
-        if (userStatistic.getTotalAnswerCount() < tier.getMinAnswerCount()) {
-            return false;
+        // 4단계 (마스터) 체크
+        if (totalAnswerCount >= 40 && totalAverageScore >= 70 && allCategoriesHaveMinAnswers(categoryAnswerCounts, 3)) {
+            return "마스터";
         }
 
-        // 2. 카테고리별 최소 답변 수 조건 체크 (조건이 있는 경우)
-        if (tier.getMinCategoryAnswer() != null && tier.getMinCategoryAnswer() > 0) {
-            if (!isAllCategoriesMinAnswersMet(userStatistic, (long) tier.getMinCategoryAnswer())) {
+        // 3단계 (에이스) 체크
+        if (totalAnswerCount >= 15 && allCategoriesHaveMinAnswers(categoryAnswerCounts, 1)) {
+            return "에이스";
+        }
+
+        // 2단계 (루키) 체크
+        if (totalAnswerCount >= 5) {
+            return "루키";
+        }
+
+        // 1단계 (뉴비) - 기본값
+        return "뉴비";
+    }
+
+    private boolean allCategoriesHaveMinAnswers(Map<Category, Long> categoryAnswerCounts, int minAnswers) {
+        // 모든 카테고리에 최소 답변 수가 있는지 확인
+        for (Category category : Category.values()) {
+            long count = categoryAnswerCounts.getOrDefault(category, 0L);
+            if (count < minAnswers) {
                 return false;
             }
         }
-
-        // 3. 평균 점수 조건 체크 (조건이 있는 경우)
-        if (tier.getMinAverageScore() != null) {
-            if (userStatistic.getAverageScore().compareTo(tier.getMinAverageScore()) < 0) {
-                return false;
-            }
-        }
-
         return true;
     }
 
-    //모든 카테고리의 최소 답변 수 조건 만족 여부 체크 (11개 카테고리)
-    private boolean isAllCategoriesMinAnswersMet(UserStatisticEntity userStatistic, Long minCount) {
-        return userStatistic.getDataStructureCount() >= minCount &&
-                userStatistic.getComputerArchitectureCount() >= minCount &&
-                userStatistic.getOperatingSystemCount() >= minCount &&
-                userStatistic.getDatabaseCount() >= minCount &&
-                userStatistic.getNetworkCount() >= minCount &&
-                userStatistic.getSoftwareEngineeringCount() >= minCount &&
-                userStatistic.getAlgorithmCount() >= minCount &&
-                userStatistic.getDesignPatternCount() >= minCount &&
-                userStatistic.getWebFrontendCount() >= minCount &&
-                userStatistic.getWebBackendCount() >= minCount &&
-                userStatistic.getCloudCount() >= minCount;
+    private String getNextTier(String currentTier) {
+        switch (currentTier) {
+            case "뉴비": return "루키";
+            case "루키": return "에이스";
+            case "에이스": return "마스터";
+            case "마스터": return "레전드";
+            case "레전드": return null; // 최고 티어
+            default: return "루키";
+        }
     }
 
-    //티어 진행도 계산
-    private StatisticResponse.TierProgressResponse calculateTierProgress(
-            UserStatisticEntity userStatistic,
-            TierInfoEntity currentTier,
-            TierInfoEntity nextTier) {
+    private double calculateProgress(long totalAnswerCount, double totalAverageScore, Map<Category, Long> categoryAnswerCounts, String currentTier) {
+        switch (currentTier) {
+            case "뉴비":
+                // 루키까지 필요한 답변 수: 5개
+                return Math.min(100.0, (totalAnswerCount / 5.0) * 100);
 
-        if (nextTier == null) {
-            // 최고 티어인 경우
-            return StatisticResponse.TierProgressResponse.builder()
-                    .answerCount(StatisticResponse.ProgressItemResponse.builder()
-                            .current(userStatistic.getTotalAnswerCount())
-                            .required(currentTier.getMinAnswerCount())
-                            .completed(true)
-                            .build())
-                    .categoryAnswers(StatisticResponse.ProgressItemResponse.builder()
-                            .current(getMinCategoryAnswerCount(userStatistic))
-                            .required(currentTier.getMinCategoryAnswer())
-                            .completed(true)
-                            .build())
-                    .averageScore(StatisticResponse.ProgressItemResponse.builder()
-                            .current(userStatistic.getAverageScore())
-                            .required(currentTier.getMinAverageScore())
-                            .completed(true)
-                            .build())
-                    .build();
+            case "루키":
+                // 에이스까지 필요한 조건: 답변 수 15개 + 모든 카테고리 1개 이상
+                double answerProgress = Math.min(100.0, (totalAnswerCount / 15.0) * 50); // 50% 가중치
+                double categoryProgress = calculateCategoryProgress(categoryAnswerCounts, 1) * 50; // 50% 가중치
+                return answerProgress + categoryProgress;
+
+            case "에이스":
+                // 마스터까지 필요한 조건: 답변 수 40개 + 모든 카테고리 3개 이상 + 평균 70점
+                double answerProg = Math.min(100.0, (totalAnswerCount / 40.0) * 40); // 40% 가중치
+                double categoryProg = calculateCategoryProgress(categoryAnswerCounts, 3) * 30; // 30% 가중치
+                double scoreProg = Math.min(100.0, (totalAverageScore / 70.0) * 30); // 30% 가중치
+                return answerProg + categoryProg + scoreProg;
+
+            case "마스터":
+                // 레전드까지 필요한 조건: 답변 수 100개 + 모든 카테고리 5개 이상 + 평균 85점
+                double answerProgMaster = Math.min(100.0, (totalAnswerCount / 100.0) * 40);
+                double categoryProgMaster = calculateCategoryProgress(categoryAnswerCounts, 5) * 30;
+                double scoreProgMaster = Math.min(100.0, (totalAverageScore / 85.0) * 30);
+                return answerProgMaster + categoryProgMaster + scoreProgMaster;
+
+            case "레전드":
+                return 100.0; // 최고 티어
+
+            default:
+                return 0.0;
+        }
+    }
+
+    private double calculateCategoryProgress(Map<Category, Long> categoryAnswerCounts, int targetMinAnswers) {
+        int totalCategories = Category.values().length;
+        int satisfiedCategories = 0;
+
+        for (Category category : Category.values()) {
+            long count = categoryAnswerCounts.getOrDefault(category, 0L);
+            if (count >= targetMinAnswers) {
+                satisfiedCategories++;
+            }
         }
 
-        // 다음 티어가 있는 경우
-        long minCategoryCount = getMinCategoryAnswerCount(userStatistic);
-
-        return StatisticResponse.TierProgressResponse.builder()
-                .answerCount(StatisticResponse.ProgressItemResponse.builder()
-                        .current(userStatistic.getTotalAnswerCount())
-                        .required(nextTier.getMinAnswerCount())
-                        .completed(userStatistic.getTotalAnswerCount() >= nextTier.getMinAnswerCount())
-                        .build())
-                .categoryAnswers(StatisticResponse.ProgressItemResponse.builder()
-                        .current(minCategoryCount)
-                        .required(nextTier.getMinCategoryAnswer())
-                        .completed(minCategoryCount >= nextTier.getMinCategoryAnswer())
-                        .build())
-                .averageScore(StatisticResponse.ProgressItemResponse.builder()
-                        .current(userStatistic.getAverageScore())
-                        .required(nextTier.getMinAverageScore())
-                        .completed(nextTier.getMinAverageScore() == null ||
-                                userStatistic.getAverageScore().compareTo(nextTier.getMinAverageScore()) >= 0)
-                        .build())
-                .build();
+        return (double) satisfiedCategories / totalCategories * 100;
     }
 
-    //카테고리별 최소 답변 수 계산 (11개 카테고리 중 최솟값)
-    private long getMinCategoryAnswerCount(UserStatisticEntity userStatistic) {
-        return Math.min(
-                Math.min(
-                        Math.min(userStatistic.getDataStructureCount(), userStatistic.getComputerArchitectureCount()),
-                        Math.min(userStatistic.getOperatingSystemCount(), userStatistic.getDatabaseCount())
-                ),
-                Math.min(
-                        Math.min(
-                                Math.min(userStatistic.getNetworkCount(), userStatistic.getSoftwareEngineeringCount()),
-                                Math.min(userStatistic.getAlgorithmCount(), userStatistic.getDesignPatternCount())
-                        ),
-                        Math.min(
-                                Math.min(userStatistic.getWebFrontendCount(), userStatistic.getWebBackendCount()),
-                                userStatistic.getCloudCount()
-                        )
-                )
-        );
-    }
+    private String createProgressMessage(long totalAnswerCount, double totalAverageScore, Map<Category, Long> categoryAnswerCounts, String currentTier) {
+        switch (currentTier) {
+            case "뉴비":
+                long neededAnswers = 5 - totalAnswerCount;
+                return neededAnswers > 0 ? String.format("루키까지 %d개의 답변이 더 필요해요!", neededAnswers) : "루키 달성 조건을 만족했어요!";
 
+            case "루키":
+                StringBuilder message = new StringBuilder();
+                if (totalAnswerCount < 15) {
+                    message.append(String.format("답변 %d개 더 필요 ", 15 - totalAnswerCount));
+                }
 
-    //TierInfoEntity -> TierInfoResponse 변환
-    private StatisticResponse.TierInfoResponse convertToTierInfoResponse(TierInfoEntity tierInfo) {
-        return StatisticResponse.TierInfoResponse.builder()
-                .tierName(tierInfo.getTierName())
-                .tierLevel(tierInfo.getTierLevel())
-                .requirements(StatisticResponse.TierRequirementsResponse.builder()
-                        .answerCount(tierInfo.getMinAnswerCount())
-                        .categoryAnswers(tierInfo.getMinCategoryAnswer())
-                        .averageScore(tierInfo.getMinAverageScore())
-                        .build())
-                .description(tierInfo.getDescription())
-                .build();
+                int unsatisfiedCategories = 0;
+                for (Category category : Category.values()) {
+                    if (categoryAnswerCounts.getOrDefault(category, 0L) < 1) {
+                        unsatisfiedCategories++;
+                    }
+                }
+
+                if (unsatisfiedCategories > 0) {
+                    message.append(String.format("(카테고리 %d개 더 도전 필요)", unsatisfiedCategories));
+                }
+
+                return message.length() > 0 ? message.toString() : "에이스 달성 조건을 만족했어요!";
+
+            case "에이스":
+                StringBuilder msgMaster = new StringBuilder();
+                if (totalAnswerCount < 40) {
+                    msgMaster.append(String.format("답변 %d개 더 필요 ", 40 - totalAnswerCount));
+                }
+                if (totalAverageScore < 70) {
+                    msgMaster.append(String.format("평균점수 %.1f점 더 필요 ", 70 - totalAverageScore));
+                }
+
+                int unsatisfiedCats = 0;
+                for (Category category : Category.values()) {
+                    if (categoryAnswerCounts.getOrDefault(category, 0L) < 3) {
+                        unsatisfiedCats++;
+                    }
+                }
+
+                if (unsatisfiedCats > 0) {
+                    msgMaster.append(String.format("(카테고리별 3개 이상 답변 %d개 카테고리 더 필요)", unsatisfiedCats));
+                }
+
+                return msgMaster.length() > 0 ? msgMaster.toString() : "마스터 달성 조건을 만족했어요!";
+
+            case "마스터":
+                StringBuilder msgLegend = new StringBuilder();
+                if (totalAnswerCount < 100) {
+                    msgLegend.append(String.format("답변 %d개 더 필요 ", 100 - totalAnswerCount));
+                }
+                if (totalAverageScore < 85) {
+                    msgLegend.append(String.format("평균점수 %.1f점 더 필요 ", 85 - totalAverageScore));
+                }
+
+                int unsatisfiedCatsLegend = 0;
+                for (Category category : Category.values()) {
+                    if (categoryAnswerCounts.getOrDefault(category, 0L) < 5) {
+                        unsatisfiedCatsLegend++;
+                    }
+                }
+
+                if (unsatisfiedCatsLegend > 0) {
+                    msgLegend.append(String.format("(카테고리별 5개 이상 답변 %d개 카테고리 더 필요)", unsatisfiedCatsLegend));
+                }
+
+                return msgLegend.length() > 0 ? msgLegend.toString() : "레전드 달성 조건을 만족했어요!";
+
+            case "레전드":
+                return "최고 티어에 도달했습니다! 정말 대단해요! 🎉";
+
+            default:
+                return "";
+        }
     }
 }
