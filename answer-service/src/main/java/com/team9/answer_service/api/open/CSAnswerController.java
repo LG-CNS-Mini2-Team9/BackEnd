@@ -48,10 +48,6 @@ public class CSAnswerController {
 
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.createAnswer(request, userDetails);
 
-        // 피드백 생성
-        FeedbackScoreResponseDto feedback = csAnswerService.createFeedback(response.getCsquestion_id(), response.getCsanswer_id(), response.getCsanswer_content());
-        response.setCsanswer_score(feedback.getScore());
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CustomResponse.created(response));
     }

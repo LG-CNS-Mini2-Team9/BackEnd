@@ -47,14 +47,21 @@ public class CSAnswerService {
             throw new IllegalArgumentException("질문이 존재하지 않습니다.");
         }
 
+        // 답변 저장
         CSAnswer answer = new CSAnswer();
         answer.setContent(request.getCsanswer_content());
         answer.setCreatedAt(LocalDateTime.now());
         answer.setScore(0);
         answer.setCsQuestionId(request.getCsquestion_id());
         answer.setUserId(userId);
-
         csAnswerRepository.save(answer);
+
+        // 피드백 생성
+        FeedbackScoreResponseDto feedback = createFeedback(request.getCsquestion_id(), answer.getId(), answer.getContent());
+        // 점수 저장
+        answer.setScore(feedback.getScore());
+        csAnswerRepository.save(answer);
+
         return buildAnswerDetailResponse(answer, user, question);
     }
 
@@ -185,7 +192,7 @@ public class CSAnswerService {
 
 
     // 피드백 생성
-    public FeedbackScoreResponseDto createFeedback(Long questionId, Long answerId, String content){
+    public FeedbackScoreResponseDto createFeedback(Long questionId, Long answerId, String content) {
         FeedbackRequestDto request = new FeedbackRequestDto(questionId, answerId, content);
         return remoteAIFeedbackService.createFeedback(request);
     }
@@ -215,7 +222,7 @@ public class CSAnswerService {
         return statisticAnswers;
     }
 
-    public void deleteAllByUserId(Long userId){
+    public void deleteAllByUserId(Long userId) {
         csAnswerRepository.deleteAllByUserId(userId);
     }
 
