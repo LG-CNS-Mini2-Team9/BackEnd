@@ -32,13 +32,6 @@ spring:
       hibernate:
         default_batch_fetch_size: 100 # N+1 문제 완화를 위한 설정
 
-  # Redis 설정 (docker-compose.yml의 redis 서비스 참조)
-  data:
-    redis:
-      host: redis
-      port: 6379
-      password: ${REDIS_PASSWORD:1234} # .env 파일에서 주입받거나 기본값 1234 사용
-
 # Eureka 클라이언트 설정 (docker-compose.yml의 eureka-server 서비스 참조)
 eureka:
   client:
