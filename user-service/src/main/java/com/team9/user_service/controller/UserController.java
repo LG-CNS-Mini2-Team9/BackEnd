@@ -95,24 +95,4 @@ public class UserController {
         userService.updateUserProfile(userId, dto);
         return ResponseEntity.ok("프로필 수정 완료");
     }
-
-    // 회원정보 수정
-//    @PostMapping("/api/user/update")
-//    public ResponseEntity<CustomResponse<String>> updateUser(@AuthenticationPrincipal UserDetails userDetails,
-//                           @ModelAttribute UpdateUserRequestDto dto) throws IOException {
-//
-////        MultipartFile image = dto.getImage();
-////        String imageUrl = s3Service.upload(image);
-//
-//        CustomResponse<String> response = userService.updateUser(userDetails.getUsername(), dto);
-//
-//        // 모든 오류 케이스에 대해 오류 메시지 달리하여 출력
-//        if (!response.isSuccess()) {
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body(response);
-//        }
-//
-//        return ResponseEntity.ok(response);
-//    }
 }
