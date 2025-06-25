@@ -1,6 +1,6 @@
 package com.team9.ai_feedback_service.global.common.exception;
 
-import com.team9.common.code.BaseErrorCode;
+import com.team9.ai_feedback_service.global.common.code.BaseErrorCode;
 import org.springframework.http.HttpStatus;
 
 public class CustomException extends RuntimeException {
@@ -18,6 +18,10 @@ public class CustomException extends RuntimeException {
 
     public BaseErrorCode getErrorCode() {
         return errorCode;
+    }
+
+    public static CustomException of(BaseErrorCode errorCode) {
+        return new CustomException(errorCode);
     }
 
 }
