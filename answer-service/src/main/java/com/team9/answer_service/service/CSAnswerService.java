@@ -206,6 +206,10 @@ public class CSAnswerService {
         return statisticAnswers;
     }
 
+    public void deleteAllByUserId(Long userId){
+        csAnswerRepository.deleteAllByUserId(userId);
+    }
+
     private Long getUserIdFromDetails(UserDetails userDetails) {
         // TODO: remoteUserService에서 findByEmail
         Long id = remoteUserService.getUserIdByEmail(userDetails.getUsername());
