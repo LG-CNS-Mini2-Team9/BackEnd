@@ -34,7 +34,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/answers/v1", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/answers", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class CSAnswerController {
     private final CSAnswerService csAnswerService;
