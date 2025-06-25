@@ -1,6 +1,6 @@
 package com.team9.question_service.repository;
 
-import com.team9.common.domain.Category;
+import com.team9.question_service.global.domain.Category;
 import com.team9.question_service.domain.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

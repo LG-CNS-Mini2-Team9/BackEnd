@@ -6,6 +6,8 @@ import com.team9.user_service.dto.request.LoginRequestDto;
 import com.team9.user_service.dto.request.SignUpRequestDto;
 import com.team9.user_service.dto.request.UpdateUserRequestDto;
 import com.team9.user_service.dto.response.UserAnswerDto;
+import com.team9.user_service.dto.request.UpdateUserProfileRequestDto;
+import com.team9.user_service.dto.response.UserProfileResponseDto;
 import com.team9.user_service.global.code.GeneralErrorCode;
 import com.team9.user_service.global.code.GeneralSuccessCode;
 import com.team9.user_service.global.response.CustomResponse;
@@ -39,26 +41,23 @@ public class UserController {
     UserRepository userRepository;
 
     // 회원가입
-    @PostMapping("/user/signup")
+    @PostMapping("/api/users/signup")
     public ResponseEntity<CustomResponse<String>> signUp(@ModelAttribute SignUpRequestDto dto) {
-
         try {
-            MultipartFile image = dto.getImage();
-            String imageUrl = s3Service.upload(image);
-
-
+            String imageUrl = s3Service.upload(dto.getImage());
             userService.signUp(dto, imageUrl);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(CustomResponse.created("회원가입 성공"));
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
+            System.out.println("회원가입 실패: " + e.getMessage());
+            e.printStackTrace();  // 상세 로그 출력
             return ResponseEntity
-                    .status(GeneralErrorCode._EMAIL_USED.getHttpStatus())
-                    .body(CustomResponse.fail(GeneralErrorCode._EMAIL_USED, "이미 존재하는 이메일입니다."));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(CustomResponse.fail(GeneralErrorCode._BAD_REQUEST, "회원가입 중 에러 발생"));
         }
     }
+
 
     // 로그인 (api-gateway)
     @PostMapping("/backend/user/v1/validate")
@@ -91,7 +90,7 @@ public class UserController {
     }
 
     // 회원 탈퇴
-    @PostMapping("/user/delete")
+    @PostMapping("/api/users/delete")
     public ResponseEntity<CustomResponse<String>> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
 
         userService.deleteUser(userDetails.getUsername()); // DB의 회원정보 삭제
@@ -101,23 +100,35 @@ public class UserController {
                 .body(CustomResponse.success(GeneralSuccessCode._OK, "회원 탈퇴 완료"));
     }
 
-    // 회원정보 수정
-    @PostMapping("/user/update")
-    public ResponseEntity<CustomResponse<String>> updateUser(@AuthenticationPrincipal UserDetails userDetails,
-                           @ModelAttribute UpdateUserRequestDto dto) throws IOException {
-
-//        MultipartFile image = dto.getImage();
-//        String imageUrl = s3Service.upload(image);
-
-        CustomResponse<String> response = userService.updateUser(userDetails.getUsername(), dto);
-
-        // 모든 오류 케이스에 대해 오류 메시지 달리하여 출력
-        if (!response.isSuccess()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST) 
-                    .body(response);
-        }
-
-        return ResponseEntity.ok(response);
+    @GetMapping("/api/users/{userId}")
+    public ResponseEntity<UserProfileResponseDto> getUserProfile(@PathVariable String userId) {
+        return ResponseEntity.ok(userService.getUserProfile(userId));
     }
+
+    @PutMapping("/api/users/{userId}")
+    public ResponseEntity<?> updateUserProfile(@PathVariable String userId,
+                                               @RequestBody UpdateUserProfileRequestDto dto) {
+        userService.updateUserProfile(userId, dto);
+        return ResponseEntity.ok("프로필 수정 완료");
+    }
+
+    // 회원정보 수정
+//    @PostMapping("/api/user/update")
+//    public ResponseEntity<CustomResponse<String>> updateUser(@AuthenticationPrincipal UserDetails userDetails,
+//                           @ModelAttribute UpdateUserRequestDto dto) throws IOException {
+//
+////        MultipartFile image = dto.getImage();
+////        String imageUrl = s3Service.upload(image);
+//
+//        CustomResponse<String> response = userService.updateUser(userDetails.getUsername(), dto);
+//
+//        // 모든 오류 케이스에 대해 오류 메시지 달리하여 출력
+//        if (!response.isSuccess()) {
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body(response);
+//        }
+//
+//        return ResponseEntity.ok(response);
+//    }
 }
