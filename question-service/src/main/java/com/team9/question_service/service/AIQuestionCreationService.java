@@ -50,28 +50,10 @@ public class AIQuestionCreationService {
                 .category(Category.valueOf(newQuestionDto.getCategory().toUpperCase()))
                 .content(newQuestionDto.getContent())
                 .keyword(newQuestionDto.getKeyword())
-                .hint(parseHint(newQuestionDto.getHint()))
-                .difficulty("MEDIUM") // 기본 난이도를 'MEDIUM'으로 설정합니다.
+                .hint(newQuestionDto.getHint())
                 .build();
 
         Question savedQuestion = questionRepository.save(newQuestion);
         log.info("새로운 AI 질문을 저장했습니다. ID: {}", savedQuestion.getId());
-    }
-
-    /**
-     * 힌트 문자열(예: "TCP, 3-way-handshake")을 Map 형태로 파싱합니다.
-     * @param hintString 파싱할 힌트 문자열
-     * @return Map<String, Object> 형태의 힌트 데이터
-     */
-    private Map<String, Object> parseHint(String hintString) {
-        if (hintString == null || hintString.isBlank()) {
-            return Collections.emptyMap();
-        }
-        // 쉼표로 구분된 힌트들을 리스트로 변환합니다.
-        List<String> hintKeywords = Arrays.stream(hintString.split(","))
-                .map(String::trim)
-                .collect(Collectors.toList());
-        // JSON 필드에 저장하기 위해 Map 형태로 만듭니다.
-        return Map.of("keywords", hintKeywords);
     }
 }
