@@ -4,13 +4,13 @@ import com.team9.answer_service.domain.CSAnswer;
 import com.team9.answer_service.domain.dto.CSAnswerRequest;
 import com.team9.answer_service.domain.dto.CSAnswerResponse;
 import com.team9.answer_service.domain.repository.CSAnswerRepository;
+import com.team9.answer_service.global.code.GeneralErrorCode;
 import com.team9.answer_service.global.code.GeneralSuccessCode;
 import com.team9.answer_service.global.response.CustomResponse;
 import com.team9.answer_service.remote.ai.dto.FeedbackScoreResponseDto;
 import com.team9.answer_service.service.CSAnswerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
@@ -37,18 +35,23 @@ public class CSAnswerController {
     @PostMapping
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> createAnswer(
             @RequestBody CSAnswerRequest.CSAnswerCreateRequest request,
-            @RequestHeader(value = "X-Auth-UserId") Long userId) {
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) {
 
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CustomResponse.fail(GeneralErrorCode._NOT_FOUND, null));
+        }
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.createAnswer(request, userId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CustomResponse.created(response));
     }
 
+
     // 내 답변 리스트 조회 (모든/질문별)
     @GetMapping(value = "/my")
     public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readMyAnswerList(
-            @RequestHeader(value = "X-Auth-UserId") Long userId,
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(required = false) Long questionId
     ) {
@@ -63,10 +66,14 @@ public class CSAnswerController {
     // 질문별 답변 리스트 조회
     @GetMapping(value = "/{questionId}")
     public ResponseEntity<CustomResponse<Page<CSAnswerResponse.CSAnswerListResponse>>> readAnswerList(
-            @RequestHeader(value = "X-Auth-UserId") Long userId,
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId,
             @RequestParam(defaultValue = "1") int page,
             @PathVariable Long questionId
     ) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CustomResponse.fail(GeneralErrorCode._NOT_FOUND, null));
+        }
         Order order = Order.desc("id");
         Sort sort = Sort.by(order);
         Pageable pageable = PageRequest.of(page - 1, 10, sort);
@@ -79,7 +86,11 @@ public class CSAnswerController {
     @GetMapping("/detail/{answerId}")
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> readAnswer(
             @PathVariable Long answerId,
-            @RequestHeader(value = "X-Auth-UserId") Long userId) {
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CustomResponse.fail(GeneralErrorCode._NOT_FOUND, null));
+        }
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.getAnswerDetail(answerId, userId);
         return ResponseEntity.ok(CustomResponse.ok(response));
     }
@@ -89,8 +100,11 @@ public class CSAnswerController {
     public ResponseEntity<CustomResponse<CSAnswerResponse.CSAnswerDetailResponse>> updateAnswer(
             @PathVariable Long answerId,
             @RequestBody CSAnswerRequest.CSAnswerUpdate request,
-            @RequestHeader(value = "X-Auth-UserId") Long userId) {
-
+            @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CustomResponse.fail(GeneralErrorCode._NOT_FOUND, null));
+        }
         CSAnswerResponse.CSAnswerDetailResponse response = csAnswerService.updateAnswer(answerId, request, userId);
 
         // 피드백 생성
@@ -101,7 +115,12 @@ public class CSAnswerController {
 
     // 답변 삭제
     @PostMapping("/{answerId}/delete")
-    public ResponseEntity<CustomResponse<Void>> deleteAnswer(@PathVariable Long answerId, @RequestHeader(value = "X-Auth-UserId") Long userId) {
+    public ResponseEntity<CustomResponse<Void>> deleteAnswer(@PathVariable Long answerId, @RequestHeader(value = "X-Auth-UserId", required = false) Long userId) {
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CustomResponse.fail(GeneralErrorCode._NOT_FOUND, null));
+        }
         csAnswerService.deleteAnswer(answerId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CustomResponse.success(GeneralSuccessCode._DELETED, null));
@@ -111,6 +130,8 @@ public class CSAnswerController {
     public List<CSAnswer> test() {
         return csAnswerRepository.findAll();
     }
+
+
 }
 
 
