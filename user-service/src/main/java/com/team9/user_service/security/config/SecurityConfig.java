@@ -22,16 +22,16 @@ public class SecurityConfig {
         return http.getSharedObject(AuthenticationManagerBuilder.class).build();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**").permitAll()
-                        .requestMatchers("/backend/user/v1/**").permitAll()  // validate, exists 등 허용
-                        .anyRequest().authenticated()
-                );
-
-        return http.build();
-    }
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/users/**").permitAll()
+//                        .requestMatchers("/backend/user/v1/**").permitAll()  // validate, exists 등 허용
+//                        .anyRequest().authenticated()
+//                );
+//
+//        return http.build();
+//    }
 }
