@@ -110,17 +110,41 @@ public class UserService {
                 .build();
     }
 
-    // 프로필 수정
     @Transactional
-    public void updateUserProfile(String email, UpdateUserProfileRequestDto dto) {
+    public void updateUserProfile(String email, UpdateUserProfileRequestDto dto, String imageUrl) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
 
-        if (dto.getName() != null) user.setName(dto.getName());
-        if (dto.getNickname() != null) user.setNickname(dto.getNickname());
-        if (dto.getProfileImage() != null) user.setProfileImage(dto.getProfileImage());
-        if (dto.getInterests() != null) user.setInterests(dto.getInterests());
+        if (dto.getName() != null) {
+            user.setName(dto.getName());
+        }
+
+        if (dto.getNickname() != null) {
+            user.setNickname(dto.getNickname());
+        }
+
+        if (imageUrl != null) {
+            user.setProfileImage(imageUrl);
+        }
+
+        if (dto.getInterests() != null) {
+            user.setInterests(dto.getInterests());
+        }
+
+        if (dto.getCurrentPassword() != null && dto.getNewPassword() != null) {
+            if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+                throw new IllegalArgumentException("기존 비밀번호가 일치하지 않습니다.");
+            }
+
+            if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
+                throw new IllegalArgumentException("기존 비밀번호와 동일한 비밀번호로는 변경할 수 없습니다.");
+            }
+
+            user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        }
 
         userRepository.save(user);
     }
+
+
 }
