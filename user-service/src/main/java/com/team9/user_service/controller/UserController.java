@@ -84,15 +84,31 @@ public class UserController {
                 .body(CustomResponse.success(GeneralSuccessCode._OK, "회원 탈퇴 완료"));
     }
 
+    // 유저정보 조회
     @GetMapping("/api/users/{userId}")
     public ResponseEntity<UserProfileResponseDto> getUserProfile(@PathVariable String userId) {
         return ResponseEntity.ok(userService.getUserProfile(userId));
     }
 
+    // 유저정보 수정
     @PutMapping("/api/users/{userId}")
     public ResponseEntity<?> updateUserProfile(@PathVariable String userId,
-                                               @RequestBody UpdateUserProfileRequestDto dto) {
-        userService.updateUserProfile(userId, dto);
-        return ResponseEntity.ok("프로필 수정 완료");
+                                               @ModelAttribute UpdateUserProfileRequestDto dto) {
+        try {
+            String imageUrl = null;
+
+            if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+                imageUrl = s3Service.upload(dto.getImage());
+            }
+
+            userService.updateUserProfile(userId, dto, imageUrl);
+            return ResponseEntity.ok("프로필 수정 완료");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("프로필 수정 중 오류 발생: " + e.getMessage());
+        }
     }
+
 }
