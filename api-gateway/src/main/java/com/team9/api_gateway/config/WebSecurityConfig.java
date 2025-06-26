@@ -47,8 +47,8 @@ public class WebSecurityConfig {
                                 .authenticationEntryPoint(authenticationEntryPoint)
                                 .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/api/auth/v1/**", "/api/users/signup").permitAll()
-                        .requestMatchers("/api/questions/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
+                        //.requestMatchers("/api/questions/**").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
